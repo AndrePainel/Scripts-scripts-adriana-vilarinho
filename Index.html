@@ -1,0 +1,3478 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scripts de Atendimento — Adriana Vilarinho</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+body{background:#3d6158;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:1.5rem}
+.app{display:grid;grid-template-columns:270px 1fr;min-height:calc(100vh - 3rem);width:100%;max-width:1100px;border-radius:14px;overflow:hidden;box-shadow:0 4px 32px rgba(0,0,0,0.25)}
+.sidebar{background:#4a7a6d;display:flex;flex-direction:column}
+.sb-header{padding:1.1rem 1rem .9rem;border-bottom:1px solid rgba(255,255,255,0.12);flex-shrink:0}
+.sb-logo{display:flex;align-items:center;gap:10px;margin-bottom:.85rem}
+.sb-icon{width:36px;height:36px;background:rgba(255,255,255,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-icon svg{width:22px;height:22px;fill:none;stroke:#fff;stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round}
+.sb-clinic{color:#fff;font-size:13px;font-weight:600;line-height:1.3}
+.sb-clinic span{display:block;color:rgba(255,255,255,0.55);font-size:11px;font-weight:400;margin-top:1px}
+.sb-search{position:relative}
+.sb-search svg{position:absolute;left:9px;top:50%;transform:translateY(-50%);width:15px;height:15px;stroke:rgba(255,255,255,0.45);fill:none;stroke-width:2;stroke-linecap:round;pointer-events:none}
+.sb-search input{width:100%;padding:7px 9px 7px 30px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);border-radius:7px;color:#fff;font-size:13px}
+.sb-search input::placeholder{color:rgba(255,255,255,0.4)}
+.sb-search input:focus{outline:none;background:rgba(255,255,255,0.15)}
+.sb-cats{flex:1;overflow-y:auto;padding:.5rem .5rem .75rem}
+.sb-cats::-webkit-scrollbar{width:3px}
+.sb-cats::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.2);border-radius:4px}
+.cat-group{margin-bottom:.2rem}
+.cat-title{font-size:10px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.8px;padding:.55rem .5rem .25rem;font-weight:600}
+.proc-btn{width:100%;text-align:left;padding:7px 9px;border-radius:7px;border:none;background:transparent;color:rgba(255,255,255,0.8);font-size:13px;cursor:pointer;line-height:1.3;transition:background .12s}
+.proc-btn:hover{background:rgba(255,255,255,0.1);color:#fff}
+.proc-btn.active{background:rgba(255,255,255,0.2);color:#fff;font-weight:600}
+.proc-btn .ph{font-size:11px;color:rgba(255,255,255,0.4);display:block;margin-top:1px}
+.main{background:#5f8a7e;display:flex;flex-direction:column}
+.main-topbar{padding:.9rem 1.2rem;border-bottom:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.main-title{color:#fff;font-size:15px;font-weight:600}
+.main-sub{color:rgba(255,255,255,0.55);font-size:12px;margin-top:2px}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:.9rem 1.2rem .75rem;flex-shrink:0}
+.stat-card{background:rgba(255,255,255,0.1);border-radius:9px;padding:.65rem .9rem;border:1px solid rgba(255,255,255,0.08)}
+.stat-n{font-size:22px;font-weight:700;color:#fff}
+.stat-l{font-size:11px;color:rgba(255,255,255,0.55);margin-top:1px}
+.content-area{flex:1;padding:0 1.2rem 1.2rem;display:flex;flex-direction:column;gap:.75rem;overflow-y:auto}
+.content-area::-webkit-scrollbar{width:4px}
+.content-area::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.2);border-radius:4px}
+.empty-main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:rgba(255,255,255,0.35);font-size:14px;padding:3rem;text-align:center;min-height:300px}
+.empty-icon{font-size:42px;opacity:.4}
+.script-wrap{background:rgba(255,255,255,0.08);border-radius:11px;border:1px solid rgba(255,255,255,0.12);overflow:hidden}
+.script-top{padding:.85rem 1rem;display:flex;align-items:flex-start;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.1)}
+.st-name{color:#fff;font-size:14px;font-weight:600}
+.st-cat{font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px}
+.st-actions{display:flex;gap:6px;flex-shrink:0;margin-left:10px;align-items:center}
+.act-btn{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:6px;border:1px solid rgba(255,255,255,0.22);background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.9);font-size:12px;cursor:pointer;transition:background .12s}
+.act-btn:hover{background:rgba(255,255,255,0.18)}
+.act-btn.copied{background:rgba(255,255,255,0.22);color:#fff}
+.tipo-pills{display:flex;gap:6px;flex-wrap:wrap;padding:.6rem 1rem .5rem;border-bottom:1px solid rgba(255,255,255,0.08)}
+.tipo-pill{padding:5px 13px;border-radius:20px;font-size:12px;border:1px solid rgba(255,255,255,0.18);background:transparent;color:rgba(255,255,255,0.6);cursor:pointer;transition:all .12s}
+.tipo-pill:hover{color:#fff;border-color:rgba(255,255,255,0.35)}
+.tipo-pill.on{background:rgba(255,255,255,0.2);color:#fff;border-color:rgba(255,255,255,0.4);font-weight:600}
+.script-body{padding:1rem 1.1rem}
+.script-txt{font-size:14px;line-height:1.9;color:rgba(255,255,255,0.92);white-space:pre-wrap}
+.atd-row{display:flex;align-items:center;gap:8px;padding:.55rem 1rem .5rem;border-top:1px solid rgba(255,255,255,0.08);background:rgba(0,0,0,0.07)}
+.atd-row span{font-size:12px;color:rgba(255,255,255,0.45)}
+.atd-row input{padding:5px 9px;border:1px solid rgba(255,255,255,0.18);border-radius:6px;background:rgba(255,255,255,0.08);color:#fff;font-size:12px;width:120px}
+.atd-row input::placeholder{color:rgba(255,255,255,0.35)}
+.atd-row input:focus{outline:none;background:rgba(255,255,255,0.14)}
+.atd-apply{padding:5px 12px;border:1px solid rgba(255,255,255,0.22);border-radius:6px;background:transparent;color:rgba(255,255,255,0.75);font-size:12px;cursor:pointer;transition:all .12s}
+.atd-apply:hover{background:rgba(255,255,255,0.1);color:#fff}
+
+@media(max-width:700px){
+  body{padding:.5rem}
+  .app{grid-template-columns:1fr;min-height:auto}
+  .sidebar{max-height:260px}
+  .stats-row{grid-template-columns:repeat(3,1fr)}
+  .stat-n{font-size:18px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="sidebar">
+  <div class="sb-header">
+    <div class="sb-logo">
+      <div class="sb-logo">
+      <img src="data:image/png;base64,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" alt="Adriana Vilarinho" style="height:44px;width:auto;border-radius:8px;display:block;">
+      <div class="sb-clinic">adriana vilarinho<span>scripts de atendimento · 67 procedimentos</span></div>
+    </div>
+    </div>
+    <div class="sb-search">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m16 16 4 4"/></svg>
+      <input type="text" id="q" placeholder="Buscar procedimento..." oninput="renderSidebar()">
+    </div>
+  </div>
+  <div class="sb-cats" id="sbCats"></div>
+</div>
+
+<div class="main">
+  <div class="main-topbar">
+    <div>
+      <div class="main-title" id="mainTitle">Selecione um procedimento</div>
+      <div class="main-sub" id="mainSub">Scripts prontos para WhatsApp</div>
+    </div>
+  </div>
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-n">67</div><div class="stat-l">Procedimentos</div></div>
+    <div class="stat-card"><div class="stat-n">268</div><div class="stat-l">Scripts prontos</div></div>
+    <div class="stat-card"><div class="stat-n" id="stCopiados">0</div><div class="stat-l">Copiados hoje</div></div>
+  </div>
+  <div class="content-area" id="contentArea">
+    <div class="empty-main">
+      <div class="empty-icon">📋</div>
+      <div>Clique em qualquer procedimento na barra lateral<br>para ver o script pronto para enviar</div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const CAT={facial:'Facial',corporal:'Corporal',capilar:'Capilar',intimo:'Íntimo',injetavel:'Injetável',estetica:'Estética'};
+const TIPOS=['Apresentação','Agendamento','Pós-procedimento','Reativação'];
+let copiados=0,tipoAtivo='Apresentação',atendente='Joyce',activeId=null;
+
+const S={
+limpezapele:{n:'Limpeza de pele',c:'estetica',h:'Extração, LED, vapor de ozônio',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Queria te contar um pouquinho sobre a nossa Limpeza de Pele aqui na Clínica Adriana Vilarinho!
+
+É um procedimento completo, feito pela nossa equipe de estética, com duração de aproximadamente 1h30. Passamos por várias etapas pensadas para deixar sua pele limpa e com muito mais viço:
+
+✔ Higienização e esfoliação
+✔ Vapor de ozônio
+✔ Extração de cravos e impurezas
+✔ Alta frequência
+✔ LED terapia
+✔ Máscara facial e finalização
+
+É ótima para controlar a oleosidade, desobstruir os poros e preparar a pele para absorver melhor outros tratamentos. Não tem contraindicações!
+
+Posso te ajudar a agendar? Qualquer dúvida, estou aqui!
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! Tudo bem? 😊
+
+Passando para confirmar sua Limpeza de Pele aqui na clínica!
+
+Para aproveitar melhor o procedimento, não é necessário nenhum preparo especial — venha com o rosto limpo e sem maquiagem.
+
+A sessão dura cerca de 1h30, então separe um tempinho no seu dia para se cuidar! 🌿
+
+Qualquer dúvida, estou à disposição. Até lá!
+
+At, {atd} 🌷`,
+'Pós-procedimento':`Olá! Como você está se sentindo? 😊
+
+Passando para deixar as orientações pós Limpeza de Pele:
+
+• A pele pode ficar um pouco avermelhada hoje — é completamente normal e passa em até 24 horas
+• Evite maquiagem no dia do procedimento
+• Use filtro solar diariamente — esse passo é essencial!
+• Evite exposição solar intensa nos próximos dias
+
+Qualquer dúvida ou se notar algo diferente, me chame! Estamos sempre por aqui.
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Estava verificando sua ficha aqui na clínica e vi que faz um tempinho que não nos vemos!
+
+Que tal dar um up na sua pele com uma Limpeza de Pele? Ela é perfeita para dar aquele viço de volta e desobstruir os poros!
+
+Posso verificar os horários disponíveis para você. É só me dizer qual dia fica melhor! 😊
+
+At, {atd} 🌷`
+}},
+peelquimico:{n:'Peeling químico',c:'estetica',h:'Renovação celular, manchas, acne',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te contar sobre o Peeling Químico aqui na Clínica Adriana Vilarinho!
+
+É um tratamento que usa ácidos específicos para promover a renovação celular da pele. É indicado para:
+
+✔ Clarear manchas e marcas de expressão
+✔ Controlar a acne e oleosidade
+✔ Melhorar textura e luminosidade da pele
+✔ Renovação celular geral
+
+O procedimento é bem rápido — menos de 30 minutos — e pode ser feito mensalmente ou quinzenalmente. A substância usada é escolhida de acordo com o seu tipo de pele!
+
+Quer saber mais ou agendar? Estou aqui! 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Peeling Químico aqui na clínica!
+
+Orientações para o dia:
+• Venha com o rosto limpo, sem maquiagem
+• Se estiver usando ácidos em casa, suspenda 3 dias antes
+• Não venha com a pele descamando ou irritada
+
+O procedimento é rápido, menos de 30 minutos. Depois você já pode retomar sua rotina normalmente!
+
+Qualquer dúvida estou por aqui. Te esperamos!
+
+At, {atd} 🌷`,
+'Pós-procedimento':`Olá! Tudo bem? 🌿
+
+Passando com as orientações pós Peeling Químico:
+
+• Use hidratante calmante conforme orientado pela nossa esteticista
+• Filtro solar é obrigatório — use diariamente!
+• Evite exposição solar direta por pelo menos 7 dias
+• Não use ácidos em casa até a pele estar completamente recuperada
+• Se descascar, não force — deixe acontecer naturalmente
+
+Qualquer dúvida, estou à disposição!
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Estava pensando em você! Faz um tempo que não faz o Peeling Químico por aqui — e ele é um dos tratamentos que mais ajudam a manter a pele renovada e as manchas claras.
+
+Que tal retomar? Tenho horários disponíveis essa semana! Me diga o melhor dia para você 😊
+
+At, {atd} 🌷`
+}},
+beautygym:{n:'Beauty Gym',c:'estetica',h:'Ginástica facial, efeito cinderela',scripts:{
+'Apresentação':`Olá! Tudo bem? 😊
+
+Já ouviu falar do Beauty Gym? É uma das nossas queridinhas aqui na Clínica Adriana Vilarinho! 🌿
+
+É uma ginástica facial com efeito lifting imediato — a gente chama de "efeito cinderela" porque você já sai de lá com a pele diferente! O procedimento inclui:
+
+✔ Massagem com bola e massagem manual
+✔ Rolete para circulação
+✔ Gua sha para drenagem
+✔ Eletroestimulação para contrair a musculatura do rosto
+
+Dura cerca de 45 minutos e pode ser feito semanalmente. Perfeito para eventos, fotos ou simplesmente para se sentir mais bonita no dia a dia!
+
+Quer agendar? É só me dizer! 🌷
+
+At, {atd}`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Beauty Gym aqui na clínica — que ótima escolha!
+
+Lembrando que o procedimento não é indicado para quem:
+• Está com acne ativa
+• Realizou aplicação de fios há menos de 30 dias
+• Aplicou toxina botulínica recentemente
+
+Se tiver qualquer uma dessas situações, me avise com antecedência! A sessão dura cerca de 45 minutos. Te esperamos!
+
+At, {atd} 🌷`,
+'Pós-procedimento':`Olá! Amou o resultado? ✨
+
+Para potencializar ainda mais o efeito do Beauty Gym:
+
+• Use filtro solar diariamente
+• Mantenha a hidratação da pele em casa
+• Pode repetir semanalmente ou sempre que quiser!
+
+Qualquer dúvida estou aqui. 😊
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Estava lembrando de você! O Beauty Gym é daqueles tratamentos que fazem muita diferença na rotina — aquele lifting imediato que deixa a pele mais firme e com viço.
+
+Que tal marcar uma sessão? Fica ótimo antes de qualquer evento! 😊
+
+At, {atd} 🌷`
+}},
+hydrafacial:{n:'Hydrafacial',c:'facial',h:'Hidro dermoabrasão, todos os tipos de pele',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Queria te apresentar o Hydrafacial, um dos nossos tratamentos favoritos aqui na Clínica Adriana Vilarinho!
+
+É uma hidro dermoabrasão que faz tudo de uma vez só:
+
+✔ Limpa e desobstrui os poros
+✔ Esfolia suavemente a pele
+✔ Extrai impurezas
+✔ Hidrata com séruns ricos em antioxidantes e peptídeos
+✔ Deixa a pele visivelmente mais luminosa
+
+O resultado é imediato, sem vermelhidão e sem período de recuperação — você sai da sessão com a pele renovada! Indicado para todos os tipos de pele, inclusive as mais sensíveis.
+
+A sessão dura cerca de 40 minutos e pode ser feita quinzenalmente.
+
+Posso te agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Hydrafacial aqui na clínica!
+
+Não é necessário nenhum preparo especial — venha com o rosto limpo, sem maquiagem. A sessão dura cerca de 40 minutos e você já pode retornar às suas atividades normalmente!
+
+Te esperamos! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Passando com os cuidados pós Hydrafacial:
+
+• Use filtro solar diariamente — é o principal cuidado!
+• Mantenha a hidratação da pele
+• Evite exposição solar intensa logo após o procedimento
+• Pode manter sua rotina de skincare normalmente
+
+A pele vai continuar melhorando nos próximos dias! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Faz um tempinho que não passa por aqui para o Hydrafacial! Esse é um daqueles tratamentos que fazem a pele "respirar" — hidratação profunda, poros limpos e aquela luminosidade de volta.
+
+Que tal marcar para essa semana? 😊
+
+At, {atd} 🌷`
+}},
+aquapure:{n:'Aquapure (Classys)',c:'facial',h:'Limpeza + hidratação inteligente',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te contar sobre o Aquapure, um tratamento facial incrível que temos aqui na clínica!
+
+É um sistema inteligente e não invasivo que cuida da pele de forma completa. Com diferentes aplicadores, ele faz uma limpeza profunda ao mesmo tempo em que aplica ativos que a pele absorve na hora. O resultado:
+
+✔ Pele mais hidratada e com brilho natural
+✔ Melhora de textura e elasticidade
+✔ Estimulação do colágeno
+✔ Sem dor e sem período de recuperação
+
+Não precisa de nenhum preparo especial e a sessão dura cerca de 60 minutos. Pode ser repetido a cada 15 dias!
+
+Quer saber mais? Estou aqui! 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Aquapure aqui na Clínica Adriana Vilarinho!
+
+Não é necessário nenhum preparo — pode vir normalmente. A sessão dura cerca de 60 minutos e você já sai com a pele hidratada e com viço!
+
+Te esperamos com carinho 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Passando com as orientações pós Aquapure:
+
+• Pode ser que a pele fique com leve vermelhidão — passa rapidinho!
+• Use filtro solar diariamente
+• Mantenha a hidratação em casa para potencializar o resultado
+
+Qualquer dúvida estou por aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Estava pensando em você! O Aquapure é um daqueles tratamentos que a pele sempre pede — hidratação profunda, limpeza e aquele brilho que todo mundo nota.
+
+Que tal marcarmos uma sessão? 😊
+
+At, {atd} 🌷`
+}},
+spectra:{n:'Spectra (Lutronic)',c:'facial',h:'Manchas, melasma, acne',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Queria te apresentar o Spectra, um dos nossos lasers mais versáteis aqui na clínica!
+
+Ele possui vários comprimentos de onda e trata diferentes condições:
+
+✔ Manchas e melasma
+✔ Acne ativa e cicatrizes de acne
+✔ Textura irregular da pele
+✔ Poros dilatados
+
+Uma das grandes vantagens é que não precisa de anestésico e pode ser feito em qualquer época do ano! A sessão dura de 15 a 30 minutos.
+
+Realizado pela nossa equipe médica. Posso te agendar uma avaliação? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Spectra aqui na Clínica Adriana Vilarinho!
+
+Não precisa de anestésico nem de preparo especial — venha com a pele limpa e sem maquiagem. A sessão é rápida, de 15 a 30 minutos!
+
+Te esperamos! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Spectra:
+
+• Use filtro solar de amplo espectro diariamente — é indispensável!
+• Evite exposição solar direta
+• Mantenha sua rotina de skincare normalmente
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Faz um tempo que não faz o Spectra por aqui! Ele é perfeito para manter as manchas e a acne sob controle — e quanto mais regular, melhor o resultado.
+
+Que tal retomar? Tenho horários disponíveis! 😊
+
+At, {atd} 🌷`
+}},
+ultraformer:{n:'Ultraformer MPT (Classys)',c:'facial',h:'Ultrassom micro + macro focado, lifting',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te falar do Ultraformer MPT, um dos nossos tratamentos mais procurados aqui na Clínica Adriana Vilarinho!
+
+É a evolução do ultrassom — combina duas tecnologias poderosas:
+
+✔ Micro focado: promove lifting facial não invasivo em uma única sessão
+✔ Macro focado: trata flacidez e gordura corporal
+
+Ele trabalha em diferentes camadas da pele — músculo, gordura, derme profunda e superficial — tudo de forma não cirúrgica. A melhora no contorno e na firmeza já é percebida desde a primeira sessão!
+
+Realizado pela equipe médica. A sessão dura cerca de 90 minutos.
+
+Posso te ajudar a agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Ultraformer MPT aqui na clínica!
+
+Para que tudo corra bem no dia:
+• Aplicaremos anestésico tópico com 60 minutos de antecedência
+• Venha com a pele limpa, sem maquiagem ou hidratante
+
+A sessão dura cerca de 90 minutos e você não precisa de período de recuperação!
+
+Te esperamos com carinho 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Ultraformer MPT:
+
+• Pode haver leve vermelhidão e inchaço por até 7 dias — é normal!
+• Evite exposição solar direta
+• Use filtro solar com alto fator de proteção diariamente
+• Siga as orientações médicas para potencializar o resultado
+
+O resultado continua evoluindo ao longo de 2 a 3 meses enquanto o colágeno é estimulado 🌿
+
+Qualquer dúvida estou aqui!
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Estava verificando sua ficha e vi que está próximo do período ideal para retornar com o Ultraformer!
+
+O ideal é manter 1 a 2 sessões por ano para preservar o lifting e a firmeza conquistados. Que tal agendarmos?
+
+At, {atd} 🌷`
+}},
+morpheus:{n:'Morpheus (InMode)',c:'facial',h:'RF micro agulhada, face e corpo',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Queria te apresentar o Morpheus, um dos tratamentos mais poderosos que temos aqui na clínica!
+
+É uma radiofrequência micro agulhada — combina micro agulhas que chegam às camadas mais profundas da pele com a radiofrequência que aquece e estimula o colágeno. Pode ser usado em:
+
+✔ Rosto e pescoço: flacidez, cicatrizes de acne, linhas finas e papada
+✔ Corpo: flacidez, celulite e estrias
+
+Indicado para todos os tipos de pele e realizado pela nossa equipe médica.
+
+Quer saber mais? Posso te ajudar a agendar uma avaliação! 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Morpheus aqui na Clínica Adriana Vilarinho!
+
+Para o dia do procedimento:
+• Aplicaremos anestésico tópico 60 minutos antes
+• Venha com a pele limpa e sem maquiagem
+
+Após o procedimento é esperado leve eritema e aspereza, que melhora progressivamente em até 7 dias (face) ou 15 dias (corpo).
+
+Qualquer dúvida estou aqui. Te esperamos!
+
+At, {atd} 🌷`,
+'Pós-procedimento':`Olá! 😊
+
+Passando com os cuidados pós Morpheus:
+
+• Eritema e aspereza são esperados — face melhora em até 7 dias, corpo até 15 dias
+• Possíveis equimoses levam até 10 dias para sumir
+• Hidrate bem a pele e use filtro solar diariamente
+• Evite sol direto na área tratada por 30 dias
+
+O colágeno continua sendo produzido nas semanas seguintes! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Passando para te lembrar que o Morpheus é indicado de 1 a 2 vezes por ano — e está na hora de manter o resultado que você conquistou!
+
+Que tal agendarmos sua próxima sessão? 😊
+
+At, {atd} 🌷`
+}},
+thermage:{n:'Thermage (Solta)',c:'facial',h:'RF monopolar, qualquer época do ano',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Queria te apresentar o Thermage, um clássico que nunca sai de moda aqui na Clínica Adriana Vilarinho!
+
+É uma radiofrequência monopolar que promove dois efeitos:
+
+✔ Contração imediata do colágeno — você já nota diferença logo após!
+✔ Estimulação de novas fibras de colágeno — o resultado melhora por meses
+
+Pode ser feito no rosto, pescoço, colo, pálpebras, braços, coxas e abdômen. E pode ser realizado em qualquer época do ano!
+
+Sessão de 60 a 90 minutos, resultado que dura de 1 a 2 anos.
+
+Posso te ajudar a agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Thermage aqui na clínica!
+
+Para o dia:
+• Aplicaremos anestésico tópico 30 minutos antes
+• Venha com a pele limpa
+
+O procedimento não interfere na sua rotina — você já pode retornar às suas atividades normalmente logo após!
+
+Te esperamos com carinho 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Boas notícias: o Thermage não exige cuidados especiais pós-procedimento!
+
+Apenas:
+• Continue usando filtro solar diariamente
+• Mantenha os cuidados habituais com a pele
+
+O resultado vai melhorando progressivamente ao longo de 2 a 6 meses 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Passando para te lembrar que o Thermage é indicado de 1 a 2 vezes por ano — e manter essa periodicidade é o segredo para preservar a firmeza conquistada!
+
+Que tal agendar sua próxima sessão? 😊
+
+At, {atd} 🌷`
+}},
+ulthera:{n:'Ulthera (Merz)',c:'facial',h:'Ultrassom micro focado com visualização',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar o Ulthera, um dos nossos tratamentos mais diferenciados aqui na clínica!
+
+O Ulthera usa ultrassom micro focado com um sistema exclusivo de visualização — a médica vê exatamente as camadas de tecido sendo tratadas em tempo real, garantindo precisão e eficácia máxima.
+
+✔ Lifting de rosto, pescoço e colo
+✔ Melhora de rugas e linhas finas
+✔ Tratamento da flacidez de dentro para fora
+
+Pode ser feito em qualquer época do ano! Sessão de 60 minutos.
+
+Posso te ajudar a agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Ulthera aqui na Clínica Adriana Vilarinho!
+
+Para o dia:
+• Aplicaremos anestésico tópico 60 minutos antes
+• Em alguns casos pode ser necessário bloqueio com anestésico injetável para maior conforto
+• Venha com a pele limpa
+
+A sessão dura cerca de 60 minutos e você não precisa de período de recuperação!
+
+Te esperamos! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Ulthera:
+
+• Pode haver leve inchaço nos dias seguintes — é normal!
+• Use filtro solar com alto fator de proteção diariamente
+• Siga as orientações da nossa equipe médica
+
+O resultado vai evoluindo ao longo de 2 a 3 meses enquanto o colágeno é produzido 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Passando para te lembrar que o Ulthera é recomendado de 1 a 2 vezes por ano — e manter essa regularidade faz toda a diferença!
+
+Posso verificar os horários disponíveis? 😊
+
+At, {atd} 🌷`
+}},
+toxina:{n:'Toxina botulínica',c:'injetavel',h:'Botox, Dysport, Xeomin',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te contar um pouco sobre a Toxina Botulínica aqui na Clínica Adriana Vilarinho!
+
+É um dos procedimentos mais realizados no mundo. A toxina relaxa temporariamente os músculos responsáveis pelas rugas de expressão, suavizando:
+
+✔ Linhas da testa e entre as sobrancelhas
+✔ Patas de galinha (ao redor dos olhos)
+✔ Rugas do pescoço
+✔ Excesso de suor (hiperidrose) nas axilas, mãos e pés
+
+Trabalhamos com Dysport, Botox e Xeomin — a escolha é feita pela médica conforme o seu perfil.
+
+O procedimento dura cerca de 30 minutos. Resultado com duração de 4 a 6 meses!
+
+Posso te ajudar a agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando sua aplicação de Toxina Botulínica aqui na clínica!
+
+Lembrando algumas orientações para o dia:
+• Venha com o rosto limpo
+• Evite anticoagulantes e álcool nos dias anteriores, se possível
+
+Após o procedimento:
+• Não deite por 3 horas
+• Evite pressão na área tratada no dia da aplicação
+• Em caso de hematoma, evite sol até sumir
+
+O resultado aparece gradualmente em até 14 dias!
+
+At, {atd} 🌷`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Toxina Botulínica:
+
+• Não deite por pelo menos 3 horas após a aplicação
+• Evite pressionar ou massagear a área tratada hoje
+• Se aparecer hematoma, evite exposição solar até sumir
+• O resultado começa a aparecer em 3 a 7 dias e atinge o pico em até 14 dias
+
+Qualquer dúvida ou se notar algo incomum, me chame! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Passando para te lembrar que já está no período ideal para reaplicar a Toxina Botulínica! O recomendado é de 4 a 6 meses entre as sessões para manter o resultado.
+
+Que tal agendarmos? Posso verificar o melhor dia para você 😊
+
+At, {atd} 🌷`
+}},
+bioestimulador:{n:'Bioestimulador de colágeno',c:'injetavel',h:'Radiesse, Sculptra, Eleva, HarmonyCa',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar os Bioestimuladores de Colágeno, um dos tratamentos que mais entregam resultados duradouros aqui na clínica!
+
+São substâncias injetáveis que estimulam o próprio corpo a produzir mais colágeno. Trabalhamos com Radiesse, Sculptra, Eleva e HarmonyCa.
+
+Indicados para:
+✔ Flacidez de rosto, pescoço e colo
+✔ Flacidez corporal (braços, coxas, abdômen, glúteos, mãos)
+✔ Prevenção do "desabamento" da face
+
+O resultado é gradual e natural! Realizado pela equipe médica.
+
+Posso te agendar uma avaliação? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando sua sessão de Bioestimulador de Colágeno aqui na clínica!
+
+Para o dia:
+• Aplicaremos anestésico tópico 30 minutos antes
+• Venha com a pele limpa
+
+Após o procedimento:
+• Massageie a região 2 vezes ao dia por 7 dias — muito importante!
+• Evite piscina, mar ou sauna por 24h
+• Filtro solar sempre!
+
+Te esperamos! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Bioestimulador de Colágeno:
+
+• Pode haver leve inchaço no local — desaparece nos próximos dias
+• Possível hematoma que some em até 10 dias
+• Massageie a região 2 vezes ao dia por 7 dias — isso é essencial!
+• Evite piscina, mar e sauna por 24 horas
+• Maquiagem e filtro solar estão liberados
+
+O resultado melhora progressivamente ao longo de 2 a 3 meses! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Passando para te lembrar que já está chegando o período ideal para a próxima sessão de Bioestimulador! Manter a regularidade potencializa muito o resultado.
+
+Que tal agendarmos? Me diga qual o melhor dia para você 😊
+
+At, {atd} 🌷`
+}},
+preenchedorAH:{n:'Preenchedores AH',c:'injetavel',h:'Restylane, HarmonyCa, Sofiderm, UP',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Vou te contar sobre os nossos Preenchedores de Ácido Hialurônico aqui na Clínica Adriana Vilarinho!
+
+O ácido hialurônico é uma substância natural do nosso corpo que vai sendo perdida com o tempo. Ao repormos, conseguimos:
+
+✔ Suavizar sulcos e rugas profundas
+✔ Volumizar lábios, maçãs do rosto e outras áreas
+✔ Corrigir assimetrias faciais
+✔ Tratar olheiras com fundo de volume
+✔ Contorno facial e de queixo
+
+Trabalhamos com Restylane, HarmonyCa, Sofiderm e UP — a escolha é feita pela médica conforme o seu objetivo!
+
+Posso te agendar uma avaliação? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu procedimento de Preenchimento com Ácido Hialurônico aqui na clínica!
+
+Orientações para o dia:
+• Venha com a pele limpa, sem maquiagem
+• Se possível, evite anticoagulantes nos dias anteriores
+
+Após o procedimento pode haver leve inchaço e hematoma — é normal e transitório!
+
+Te esperamos com carinho! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Preenchimento com Ácido Hialurônico:
+
+• Leve edema e possível hematoma são normais — somem em poucos dias
+• Não pressione nem massageie a área tratada
+• Use filtro solar diariamente
+• Para lábios: evite movimentos excessivos nas primeiras horas
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Passando para te lembrar que o preenchimento com ácido hialurônico vai sendo absorvido gradualmente pelo organismo — e manter o tratamento em dia garante a naturalidade e o volume que você gosta!
+
+Que tal agendarmos uma avaliação com a médica? 😊
+
+At, {atd} 🌷`
+}},
+profhilo:{n:'Profhilo (Ibsa)',c:'injetavel',h:'AH ultrapuro, firmeza sem volumizar',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar o Profhilo, um dos tratamentos mais inovadores que temos aqui na clínica!
+
+É um ácido hialurônico ultrapuro, sem aditivos químicos, com alta concentração. Ele não volumiza — age na qualidade da pele:
+
+✔ Estimula colágeno e elastina
+✔ Melhora a firmeza e sustentação da pele
+✔ Hidratação profunda e de longa duração
+✔ Resultado natural — sem mudar as feições
+
+São 2 sessões iniciais com 30 dias de intervalo, depois manutenção a cada 6 meses.
+
+Quer saber mais ou agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Profhilo aqui na Clínica Adriana Vilarinho!
+
+A sessão é rápida — cerca de 30 minutos. Não é necessário preparo especial.
+
+Após o procedimento pode haver uma leve elevação no local que se distribui naturalmente em 24 a 48 horas — é completamente normal!
+
+Te esperamos com carinho 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Profhilo:
+
+• Pode aparecer uma leve elevação no local — ela se distribui sozinha em 24 a 48 horas
+• Possíveis equimoses que somem em poucos dias
+• Use filtro solar diariamente
+• Mantenha hidratação da pele
+
+O resultado melhora nas semanas seguintes! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Passando para te lembrar que está chegando a hora da manutenção do Profhilo! O ideal é manter a cada 6 meses para conservar a firmeza e a qualidade de pele conquistadas.
+
+Posso verificar os horários disponíveis para você? 😊
+
+At, {atd} 🌷`
+}},
+skinbooster:{n:'Skinbooster (Galderma)',c:'injetavel',h:'AH fluido, hidratação profunda',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar o Skinbooster — um tratamento injetável focado em hidratação profunda e qualidade de pele!
+
+Diferente dos preenchedores, ele não volumiza — o objetivo é melhorar a textura, a elasticidade e o viço da pele de dentro para fora:
+
+✔ Restylane Vital: para peles mais grossas
+✔ Restylane Vital Light: para peles mais finas
+
+Perfeito para pele desidratada, sem brilho ou com textura irregular!
+
+A sessão dura cerca de 30 minutos. Pode ser repetido a cada 4 a 6 semanas.
+
+Quer saber mais? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Skinbooster aqui na clínica!
+
+Não é necessário preparo especial. A sessão dura cerca de 30 minutos.
+
+Após o procedimento pode haver leve inchaço e vermelhidão — são transitórios!
+
+Te esperamos! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Skinbooster:
+
+• Possível inchaço, vermelhidão e pequeno hematoma — normal e transitório!
+• Evite exposição solar em caso de hematoma
+• Use filtro solar diariamente
+• Mantenha a rotina de hidratação em casa
+
+O resultado melhora nos dias seguintes! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Estava pensando em você! O Skinbooster é aquele tratamento que mantém a pele sempre hidratada e com aquele brilho saudável — e manter a periodicidade faz toda a diferença.
+
+Que tal marcarmos sua próxima sessão? 😊
+
+At, {atd} 🌷`
+}},
+resurfx:{n:'ResurFX (Lumenis)',c:'facial',h:'1565nm não ablativo, todos os fototipos',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar o ResurFX, um dos nossos lasers mais completos aqui na Clínica Adriana Vilarinho!
+
+É um laser fracionado não ablativo que aquece as camadas mais profundas da pele, estimulando o colágeno de dentro para fora:
+
+✔ Rejuvenescimento facial
+✔ Manchas e melasma
+✔ Estrias
+✔ Rugas e cicatrizes de acne
+✔ Queda de cabelo (couro cabeludo)
+
+Pode ser usado em todos os tipos de pele! Tempo de recuperação curto: de 1 a 5 dias.
+
+Posso te ajudar a agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu ResurFX aqui na clínica!
+
+Para o dia:
+• Aplicaremos anestésico tópico 60 minutos antes
+• Venha com a pele limpa, sem maquiagem ou hidratante
+• A pele não pode estar bronzeada
+
+Após a sessão aplicaremos uma máscara calmante por 30 minutos.
+
+Te esperamos! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós ResurFX:
+
+• Pode haver inchaço e vermelhidão — somem ao longo dos dias
+• Evite exposição solar por 15 dias
+• Aplique proteção solar diariamente
+• Mantenha a pele hidratada
+
+O resultado continua melhorando nas semanas seguintes! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Estava verificando sua ficha e vi que está na hora de retomar o ResurFX! A regularidade é o que garante os melhores resultados.
+
+Posso verificar os horários disponíveis para você? 😊
+
+At, {atd} 🌷`
+}},
+coolsculpting:{n:'Coolsculpting (Allergan)',c:'corporal',h:'Criolipólise, até 27% de redução',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te contar sobre o Coolsculpting, nossa tecnologia de criolipólise aqui na clínica!
+
+É a única criolipólise com aprovação FDA. Com resfriamento de até -11°C e o Sistema Freeze Detect para total segurança:
+
+✔ Reduz até 27% de gordura por sessão
+✔ Não invasivo, sem cirurgia e sem recuperação
+✔ Resultados visíveis a partir da 4ª semana
+
+O tempo de sessão varia de 35 a 75 minutos por região.
+
+Posso te agendar uma avaliação? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Coolsculpting aqui na clínica!
+
+Não é necessário preparo especial. A sessão dura de 35 a 75 minutos dependendo da região.
+
+Após o procedimento pode haver inchaço, vermelhidão e dormência — são normais e transitórios! Em caso de hematoma, evite sol.
+
+Te esperamos 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Coolsculpting:
+
+Pós imediato:
+• Inchaço, vermelhidão e dormência são esperados
+• Evite sol na área se houver hematoma
+
+Pós tardio (~1 semana):
+• Pode haver dor, coceira e pontadas na região — faz parte do processo!
+
+Os resultados começam a aparecer a partir da 4ª semana 🌿
+
+Qualquer dúvida estou aqui!
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Passando para te lembrar que novas sessões de Coolsculpting podem ser feitas com intervalo de 60 dias — e cada sessão potencializa o resultado anterior!
+
+Quer agendar? Posso verificar os horários disponíveis 😊
+
+At, {atd} 🌷`
+}},
+emtone:{n:'EMTone (BTL)',c:'corporal',h:'Radiofrequência + pressão acústica',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar o EMTone, um dos nossos tratamentos corporais mais inovadores aqui na clínica!
+
+Ele combina radiofrequência e energia de pressão direcionada (ondas acústicas) — tratando não só a aparência da celulite, mas as causas dela:
+
+✔ Redução de celulite de forma não invasiva e indolor
+✔ Melhora da flacidez da pele
+✔ Tratamento fisiológico
+
+Sessão de 20 a 30 minutos, recomendada uma vez por semana.
+
+Posso te agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu EMTone aqui na clínica!
+
+Não é necessário nenhum preparo especial. A sessão dura de 20 a 30 minutos.
+
+Após o procedimento pode haver leve vermelhidão — normal e passageira!
+
+Te esperamos! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Pós EMTone as orientações são bem simples:
+
+• Pode haver leve vermelhidão na área tratada — passa rapidinho!
+• Mantenha hidratação e alimentação saudável para potencializar o resultado
+• Retorne na data combinada para manter a sequência do protocolo
+
+Qualquer dúvida estou aqui 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Estava verificando que você ainda tem sessões do protocolo EMTone em aberto! A regularidade é essencial para alcançar o resultado esperado no tratamento de celulite.
+
+Que tal retomar? Tenho horários disponíveis essa semana 😊
+
+At, {atd} 🌷`
+}},
+drenagem:{n:'Drenagem linfática',c:'corporal',h:'Pré e pós-cirúrgico, gestantes',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te contar sobre a Drenagem Linfática aqui na Clínica Adriana Vilarinho!
+
+É uma massagem que estimula o sistema linfático, acelerando a eliminação de líquidos e toxinas. É indicada para:
+
+✔ Pré e pós-cirúrgico
+✔ Relaxamento e bem-estar
+✔ Melhora da circulação local
+✔ Gestantes (com autorização do ginecologista)
+
+Facial: ~30 minutos | Corporal: ~60 minutos
+
+Pode ser feita 1 a 2 vezes por semana. Posso te agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando sua Drenagem Linfática aqui na clínica!
+
+Não é necessário preparo especial. A sessão dura 30 minutos (facial) ou 60 minutos (corporal).
+
+Dica: beba bastante água após o procedimento para potencializar a eliminação de toxinas!
+
+Te esperamos 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Pós Drenagem Linfática:
+
+• Beba bastante água — fundamental para ajudar o organismo a eliminar as toxinas!
+• Evite bebidas alcoólicas e alimentos muito processados
+• Pode repetir 1 a 2 vezes por semana para manter os resultados
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Estava pensando em você! A Drenagem Linfática é um daqueles cuidados que o corpo agradece sempre.
+
+Que tal marcar uma sessão? 😊
+
+At, {atd} 🌷`
+}},
+bioimpedancia:{n:'Bioimpedância',c:'corporal',h:'Avaliação de composição corporal, grátis',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Sabia que oferecemos a Bioimpedância gratuitamente aqui na Clínica Adriana Vilarinho?
+
+É um exame que mede a composição corporal, fornecendo informações como:
+
+✔ Percentual de gordura
+✔ Massa muscular
+✔ Retenção de líquido
+✔ Metabolismo basal e IMC
+
+É o ponto de partida ideal para definir o melhor protocolo de tratamento corporal para você!
+
+Quer agendar a sua avaliação? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando sua avaliação com Bioimpedância aqui na clínica!
+
+Para o resultado ser mais preciso:
+• Venha em jejum de 2 a 3 horas (incluindo água)
+• Retire adornos metálicos (pulseiras, anéis, brincos)
+• Evite exercícios intensos no dia anterior
+
+A avaliação é bem rápida! Te esperamos 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Obrigada por fazer sua avaliação conosco!
+
+Com base nos resultados da Bioimpedância, nossa equipe vai indicar o melhor protocolo de tratamento para os seus objetivos.
+
+Qualquer dúvida sobre os próximos passos, estou por aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Faz um tempinho que não atualiza sua Bioimpedância! Acompanhar sua composição corporal é muito importante para verificar os resultados dos tratamentos.
+
+Que tal passar para uma nova avaliação? É rápido e gratuito! 😊
+
+At, {atd} 🌷`
+}},
+depilacaosoprano:{n:'Depilação Soprano Ice',c:'corporal',h:'Laser Diodo, todos os fototipos',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te contar sobre a nossa Depilação a Laser aqui na Clínica Adriana Vilarinho!
+
+O Soprano Ice é um laser de Diodo com uma característica muito especial: indicado para todos os fototipos de pele, inclusive pele negra — e também funciona em pelos mais finos!
+
+✔ Destrói o bulbo e a haste dos pelos progressivamente
+✔ Pelos residuais perdem espessura
+✔ Indolor e com sessão rápida
+
+Sessão a partir de 15 minutos. Intervalos de aproximadamente 1 mês.
+
+Quer saber mais? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando sua sessão de Depilação a Laser aqui na clínica!
+
+Orientações importantes:
+• Raspe os pelos da região a ser tratada 24 a 48 horas antes
+• Evite exposição solar por 30 dias — especialmente nas áreas expostas
+• Não venha com a pele bronzeada
+
+Te esperamos! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Depilação a Laser:
+
+• Evite exposição solar por 7 dias
+• Use filtro solar nas áreas depiladas expostas ao sol
+• Não arranque os pelos que crescerem — apenas raspe com lâmina!
+• Se necessário, use pomada calmante
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Passando para te lembrar que já está na hora da próxima sessão de depilação! O intervalo ideal é de cerca de 1 mês para acompanhar o ciclo de crescimento dos pelos.
+
+Posso verificar os horários disponíveis? 😊
+
+At, {atd} 🌷`
+}},
+intradermocapilar:{n:'Intradermoterapia capilar',c:'capilar',h:'Queda de cabelo, couro cabeludo',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Queria te falar sobre a Intradermoterapia Capilar, um dos nossos tratamentos para queda de cabelo aqui na Clínica Adriana Vilarinho!
+
+Medicamentos e ativos são aplicados diretamente no couro cabeludo com agulhas finíssimas, chegando exatamente onde precisam agir:
+
+✔ Estimula o crescimento dos fios
+✔ Melhora a circulação no couro cabeludo
+✔ Fortalece os fios
+✔ Reduz a queda
+
+Sessão de 20 a 30 minutos, realizada pela nossa equipe médica.
+
+Posso te ajudar a agendar uma avaliação? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando sua Intradermoterapia Capilar aqui na clínica!
+
+Não é necessário preparo especial — pode vir com o cabelo lavado normalmente.
+
+A sessão dura de 20 a 30 minutos. Pode haver leve vermelhidão e sensibilidade no couro cabeludo após — é normal e passa rapidinho!
+
+Te esperamos! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Intradermoterapia Capilar:
+
+• Pode haver leve vermelhidão ou sensibilidade — normal e transitório!
+• Evite lavar o cabelo por algumas horas após (conforme orientação médica)
+• Mantenha o tratamento domiciliar indicado pela médica — faz parte essencial do protocolo!
+• Use protetor solar no couro cabeludo se for se expor ao sol
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Estava verificando sua ficha e vi que faz um tempo que não vem para a Intradermoterapia Capilar! A regularidade faz toda a diferença nos resultados.
+
+Que tal retomar? O protocolo ideal é de 4 a 6 sessões 😊
+
+At, {atd} 🌷`
+}},
+prpcapilar:{n:'PRP capilar',c:'capilar',h:'Plasma rico em plaquetas, calvície',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar o PRP Capilar aqui na Clínica Adriana Vilarinho!
+
+PRP significa Plasma Rico em Plaquetas — e o especial é que usamos o plasma do próprio paciente! Uma pequena amostra de sangue é coletada, processada e aplicada no couro cabeludo. As plaquetas estimulam:
+
+✔ O crescimento capilar
+✔ Combate à calvície masculina e feminina
+✔ Recuperação dos fios pós-parto
+✔ Fortalecimento de fios finos e fracos
+
+Sessão de 60 minutos. Realizado pela equipe médica!
+
+Posso te ajudar a agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu PRP Capilar aqui na clínica!
+
+Orientações para o dia:
+• Venha bem hidratado(a) — beba água antes!
+• Coma normalmente antes de vir
+
+A sessão dura 60 minutos. Te esperamos 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós PRP Capilar:
+
+• Evite lavar o cabelo conforme orientação médica (geralmente 24h)
+• Pode haver sensibilidade ou dolorimento no couro cabeludo até o dia seguinte
+• Evite exposição solar intensa no couro cabeludo
+• Mantenha o tratamento domiciliar indicado
+
+O resultado é gradual — os fios ficam mais fortes e a queda diminui ao longo das sessões 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Estava verificando sua ficha e vi que está no período ideal para a próxima sessão de PRP Capilar! O tratamento funciona em sequência e cada sessão potencializa o resultado anterior.
+
+Posso verificar os horários disponíveis? 😊
+
+At, {atd} 🌷`
+}},
+terapiacapilar:{n:'Terapia capilar',c:'capilar',h:'Queda, oleosidade, nutrição e volume',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te contar sobre a nossa Terapia Capilar aqui na Clínica Adriana Vilarinho!
+
+É um conjunto de tratamentos personalizados para a saúde do couro cabeludo e dos fios. Temos protocolos para:
+
+✔ Queda de cabelo
+✔ Fios ressecados e opacos
+✔ Cabelos quebradiços
+✔ Oleosidade excessiva
+✔ Dermatite seborreica
+✔ Falta de volume
+
+Antes de iniciar, nosso(a) terapeuta capilar faz uma avaliação completa para indicar o protocolo ideal — personalizado para você!
+
+Sessão de cerca de 1h30. Quer agendar uma avaliação? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando sua Terapia Capilar aqui na clínica!
+
+Não é necessário nenhum preparo especial. Nosso(a) terapeuta vai avaliar o couro cabeludo antes de iniciar!
+
+A sessão dura cerca de 1h30. Te esperamos com carinho 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Pós Terapia Capilar, siga as orientações do(a) nosso(a) terapeuta quanto ao método de higienização do couro cabeludo e como desembaraçar os fios em casa.
+
+Essas orientações são importantes para manter o resultado da sessão! 🌿
+
+Qualquer dúvida estou por aqui.
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Estava pensando em você! A Terapia Capilar é um tratamento que os cabelos sempre agradecem — e manter a regularidade faz toda a diferença na saúde dos fios.
+
+Que tal agendar para essa semana? 😊
+
+At, {atd} 🌷`
+}},
+fotonaintimo:{n:'Fotona íntimo',c:'intimo',h:'Erbium + ND, rejuvenescimento vaginal',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Queria te apresentar o Fotona Íntimo, um tratamento que tem transformado a qualidade de vida de muitas pacientes aqui na clínica!
+
+É um tratamento a laser para o rejuvenescimento e bem-estar íntimo feminino. Com lasers Erbium e ND, não invasivo, trata:
+
+✔ Rejuvenescimento vaginal
+✔ Flacidez da região íntima
+✔ Secura vaginal
+✔ Incontinência urinária
+
+Rápido, indolor e sem período de recuperação. Protocolo de 3 a 4 sessões com manutenção a cada 6 a 12 meses.
+
+Posso te ajudar a agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Fotona Íntimo aqui na Clínica Adriana Vilarinho!
+
+Para o dia:
+• Não estar menstruada
+• Higiene íntima no dia
+• Evitar produtos íntimos no dia
+
+Após o procedimento:
+• Suspender relações sexuais por 4 dias
+• Prefira roupas leves e confortáveis
+
+Te esperamos! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Fotona Íntimo:
+
+• É normal a região ficar levemente avermelhada e sensível
+• Lave o local 2 vezes ao dia com sabonete neutro
+• Aplique os produtos indicados conforme a receita médica
+• Suspenda relações sexuais por 4 dias
+• Prefira roupas leves — evite tecidos sintéticos
+• Evite absorventes internos nos primeiros 7 dias
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Passando para te lembrar que está chegando o período ideal para a manutenção do Fotona Íntimo! O recomendado é de 6 a 12 meses entre as manutenções.
+
+Posso verificar os horários disponíveis para você? 😊
+
+At, {atd} 🌷`
+}}
+};
+
+
+// Procedimentos adicionais
+const NOVOS_S = {
+fiosaptos:{n:'Fios Aptos',c:'facial',h:'Ácido polilático, lifting 12–18 meses',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Queria te apresentar os Fios Aptos, um dos tratamentos de rejuvenescimento mais completos que temos aqui na Clínica Adriana Vilarinho!
+
+São fios de sustentação absorvíveis, feitos de ácido polilático e policaprolactona. Ao serem inseridos sob a pele em regiões estratégicas do rosto, eles:
+
+✔ Promovem efeito lifting imediato
+✔ Estimulam a produção de colágeno e fibras elásticas
+✔ Firmam e reposicionam a pele
+✔ Definem o contorno facial e corrigem a flacidez
+✔ São absorvidos pelo organismo em 12 a 18 meses
+
+É um procedimento feito pela nossa equipe médica, com duração mínima de 60 minutos. O resultado é natural e duradouro!
+
+Posso te ajudar a agendar uma avaliação? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu procedimento de Fios Aptos aqui na Clínica Adriana Vilarinho!
+
+Lembrando que não é indicado para gestantes, pessoas com doenças autoimunes, infecções ativas ou distúrbios de coagulação. Se houver qualquer dúvida, me avise com antecedência!
+
+Após o procedimento, os cuidados são fundamentais. Vou te passar todas as orientações no dia. Te esperamos!
+
+At, {atd} 🌷`,
+'Pós-procedimento':`Olá! 😊
+
+Passando com os cuidados pós Fios Aptos — esses primeiros dias são muito importantes!
+
+• Mantenha a cabeça elevada nas 3 primeiras noites e durma de barriga para cima
+• Lave e seque o rosto com cuidado, sem esfregar, por 3 dias
+• Evite exposição solar direta
+• Evite massagens e tratamentos estéticos faciais por 3 semanas
+• Sem esportes de contato por 10 dias
+• Sem sauna por 3 semanas
+• Evite movimentos faciais excessivos por 15 dias
+• Sem tratamentos dentários por 3 semanas
+
+Qualquer dúvida ou desconforto, me chame! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Passando para te lembrar que os Fios Aptos podem ser renovados a cada 12 a 24 meses — e esse é o período ideal para manter o lifting e a firmeza conquistados!
+
+Que tal agendar uma avaliação para vermos como está e planejar os próximos passos? 😊
+
+At, {atd} 🌷`
+}},
+fiosbiofils:{n:'Fios Biofils PLA/CL',c:'facial',h:'Lifting e colágeno, 6–24 meses',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar os Fios Biofils, um tratamento incrível para quem busca lifting e firmeza facial de forma não cirúrgica!
+
+São fios absorvíveis de ácido polilático e policaprolactona que, ao serem inseridos estrategicamente no rosto:
+
+✔ Promovem efeito lifting imediato
+✔ Estimulam colágeno e fibras elásticas progressivamente
+✔ Firmam e reposicionam a pele
+✔ Definem o contorno facial
+✔ Absorção de 6 a 24 meses
+
+Realizado pela equipe médica. A sessão dura de 30 a 60 minutos dependendo das áreas tratadas.
+
+Quer saber mais ou agendar uma avaliação? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu procedimento de Fios Biofils aqui na clínica!
+
+Orientações pré-procedimento:
+• Suspender anticoagulantes 1 semana antes, conforme orientação médica
+• Evitar álcool nos dias anteriores
+
+Após o procedimento, passarei todas as orientações de cuidado. Te esperamos!
+
+At, {atd} 🌷`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Fios Biofils — siga com atenção para garantir o melhor resultado!
+
+• Mantenha a cabeça elevada nas 3 primeiras noites
+• Lave e seque o rosto com cuidado, sem esfregar, por 3 dias
+• Evite exposição solar direta
+• Sem massagens ou tratamentos estéticos faciais por 3 semanas
+• Evite esportes de contato por 10 dias
+• Sem sauna por 3 semanas
+• Evite movimentos faciais excessivos por 15 dias
+• Sem tratamentos dentários por 3 semanas
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Passando para te lembrar que está chegando o período de renovação dos Fios Biofils! Manter o tratamento em dia preserva o contorno e a firmeza que você conquistou.
+
+Que tal agendar uma avaliação? 😊
+
+At, {atd} 🌷`
+}},
+fiospdo:{n:'Fios PDO (Medbeauty)',c:'facial',h:'Polidioxanona, lifting imediato, 6–8 meses',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te contar sobre os Fios PDO, uma das nossas opções de tratamento para lifting e estímulo de colágeno aqui na clínica!
+
+São fios de polidioxanona, material 100% absorvível, que vêm em dois tipos:
+
+✔ Espiculados ou com micro cones: efeito lifting imediato — a pele é reposicionada na hora!
+✔ Lisos: estimulam o colágeno progressivamente, com resultado mais gradual
+
+Os resultados surgem com mais intensidade nas semanas seguintes, quando a produção de colágeno se torna mais visível. Duração de 6 a 8 meses.
+
+Realizado pela equipe médica. Posso te agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu procedimento de Fios PDO aqui na Clínica Adriana Vilarinho!
+
+Para o dia: aplicaremos anestésico tópico 30 minutos antes. Venha com o rosto limpo, sem maquiagem.
+
+Após o procedimento vou te passar todas as orientações de cuidado. Te esperamos!
+
+At, {atd} 🌷`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Fios PDO:
+
+• Lave e seque o rosto com cuidado, sem esfregar, por 3 dias
+• Evite exposição solar direta
+• Sem massagens ou tratamentos estéticos faciais por 3 semanas
+• Evite esportes de contato por 10 dias
+• Sem sauna por 3 semanas
+• Evite movimentos faciais excessivos por 15 dias
+• Sem tratamentos dentários por 3 semanas
+
+O resultado continua melhorando nas semanas seguintes! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Passando para te lembrar que os Fios PDO têm duração de 6 a 8 meses — e está na hora de renovar o efeito lifting!
+
+Que tal agendar uma avaliação? 😊
+
+At, {atd} 🌷`
+}},
+fiossilhouette:{n:'Fios Silhouette (Sinclair)',c:'facial',h:'Ácido polilático com cones, 12–18 meses',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Queria te apresentar os Fios Silhouette, um tratamento de lifting facial muito especial que temos aqui na clínica!
+
+São fios de ácido polilático com cones que sustentam a pele e estimulam o colágeno progressivamente. Eles:
+
+✔ Promovem efeito lifting imediato
+✔ Reposicionam estruturalmente o rosto
+✔ Melhoram o contorno facial e cervical
+✔ Estimulam colágeno com resultado que melhora ao longo dos meses
+✔ Duração de 12 a 18 meses
+
+Realizado pela equipe médica com duração mínima de 60 minutos.
+
+Posso te ajudar a agendar uma avaliação? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu procedimento de Fios Silhouette aqui na Clínica Adriana Vilarinho!
+
+Para o dia: aplicaremos anestésico tópico 30 minutos antes. Venha com o rosto limpo.
+
+Após o procedimento passarei todas as orientações de cuidado necessárias. Te esperamos!
+
+At, {atd} 🌷`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Fios Silhouette:
+
+• Lave e seque o rosto com cuidado, sem esfregar, por 3 dias
+• Evite exposição solar direta
+• Sem massagens ou tratamentos estéticos por 3 semanas
+• Evite esportes de contato por 10 dias
+• Sem sauna por 3 semanas
+• Evite movimentos faciais excessivos por 15 dias
+• Sem tratamentos dentários por 3 semanas
+
+O resultado melhora progressivamente com o estímulo de colágeno! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Os Fios Silhouette têm duração de 12 a 18 meses — e está chegando o período ideal para renovar o lifting e a sustentação facial!
+
+Que tal agendar uma avaliação? 😊
+
+At, {atd} 🌷`
+}},
+fraxeldual:{n:'Fraxel Dual (Solta Medical)',c:'facial',h:'Dois comprimentos de onda, manchas e cicatrizes',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar o Fraxel Dual, um dos nossos lasers mais completos para rejuvenescimento aqui na Clínica Adriana Vilarinho!
+
+É uma combinação de dois tipos de laser fracionado que trata tanto a profundidade quanto a superfície da pele:
+
+✔ 1550nm: indicado para cicatrizes, linhas profundas e estrias
+✔ 1927nm: trata danos solares, manchas, olheiras e textura
+
+Juntos, estimulam a produção de colágeno e promovem uma renovação celular profunda. Disponível nas unidades Jd. Paulista e Jd. Europa.
+
+A sessão dura 30 minutos + 30 minutos de máscara. Realizado pela equipe médica.
+
+Posso te ajudar a agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Fraxel Dual aqui na clínica!
+
+Para o dia:
+• Aplicaremos anestésico tópico 60 minutos antes
+• Venha com a pele limpa, não bronzeada e sem maquiagem
+
+Após a sessão aplicaremos uma máscara calmante por 30 minutos. Te esperamos!
+
+At, {atd} 🌷`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Fraxel Dual:
+
+• Pele avermelhada por 2 a 3 dias — normal!
+• Ardência e calor nos primeiros dias
+• Aspereza na pele por 5 a 7 dias
+• Evite sol por 15 dias
+• Filtro solar diariamente, mesmo em casa
+• Maquiagem liberada no dia seguinte
+• Siga as orientações médicas
+
+O resultado continua melhorando nas semanas seguintes! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Estava verificando sua ficha e vi que está no período ideal para retomar o Fraxel Dual! O intervalo entre sessões é de aproximadamente 4 semanas.
+
+Posso verificar os horários disponíveis? 😊
+
+At, {atd} 🌷`
+}},
+fraxelrepair:{n:'Fraxel Repair (Solta Medical)',c:'facial',h:'CO2 fracionado ablativo, Jd. Paulista',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar o Fraxel Repair, um dos nossos lasers mais poderosos para renovação de pele aqui na clínica!
+
+É um laser de CO2 fracionado ablativo que renova profundamente a pele, removendo células danificadas e estimulando o processo natural de cicatrização. Indicado para:
+
+✔ Rugas ao redor dos olhos e em geral
+✔ Manchas solares e de idade
+✔ Fotoenvelhecimento
+✔ Cicatrizes de acne
+✔ Estrias e poros dilatados
+✔ Estimulação de colágeno
+
+Disponível na unidade Jd. Paulista. Realizado pela equipe médica.
+
+Posso te ajudar a agendar uma avaliação? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Fraxel Repair aqui na clínica!
+
+Para o dia:
+• Aplicaremos anestésico tópico 60 minutos antes
+• A pele não pode estar bronzeada
+• Pare o uso de ácidos e cremes 2 dias antes
+• Venha com a pele limpa
+
+Aplicaremos máscara calmante após o procedimento. Te esperamos!
+
+At, {atd} 🌷`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Fraxel Repair:
+
+• Pele avermelhada por 2 a 3 dias — é normal!
+• Ardência e calor nos primeiros dias
+• Aspereza por 5 a 7 dias
+• Evite sol por 15 dias
+• Filtro solar diariamente
+• Maquiagem liberada no dia seguinte
+• Siga todas as orientações médicas
+
+O resultado melhora ao longo das semanas enquanto o colágeno é produzido! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Passando para te lembrar que está no período ideal para retomar o Fraxel Repair! O intervalo entre sessões é de aproximadamente 4 semanas.
+
+Posso verificar os horários disponíveis? 😊
+
+At, {atd} 🌷`
+}},
+fraxelrestore:{n:'Fraxel Restore (Solta Medical)',c:'facial',h:'Erbium não ablativo, Anália Franco',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar o Fraxel Restore, um laser fracionado não ablativo que temos aqui na Clínica Adriana Vilarinho, disponível na unidade Anália Franco!
+
+Ele usa laser de erbium para promover o remodelamento das fibras de colágeno e elastina de dentro para fora, tratando:
+
+✔ Rugas finas em geral
+✔ Manchas solares e de idade (inclusive no colo)
+✔ Fotoenvelhecimento
+✔ Cicatrizes de acne
+✔ Estrias e poros dilatados
+
+A grande vantagem é que, por ser não ablativo, o tempo de recuperação é menor. Realizado pela equipe médica.
+
+Quer saber mais ou agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Fraxel Restore aqui na clínica!
+
+Para o dia:
+• Aplicaremos anestésico tópico 60 minutos antes
+• A pele não pode estar bronzeada
+• Pare o uso de ácidos 3 a 5 dias antes e cremes 2 dias antes
+
+A sessão tem duração de 30 minutos por área e aplicamos máscara calmante após. Te esperamos!
+
+At, {atd} 🌷`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Fraxel Restore:
+
+• Pele avermelhada por 2 a 3 dias — normal!
+• Ardência e calor nos primeiros dias
+• Aspereza por 5 a 7 dias
+• Evite sol por 15 dias
+• Filtro solar diariamente
+• Maquiagem liberada no dia seguinte
+
+O resultado melhora progressivamente! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Está no período ideal para retomar o Fraxel Restore — o intervalo entre sessões é de aproximadamente 4 semanas.
+
+Posso verificar os horários disponíveis? 😊
+
+At, {atd} 🌷`
+}},
+harmonyx:{n:'Harmony XL (Alma Lasers)',c:'facial',h:'Pixel + Luz Pulsada, manchas e vasinhos',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar o Harmony XL, uma plataforma multifuncional que temos aqui na clínica, disponível na unidade Anália Franco!
+
+Ele combina duas tecnologias poderosas:
+
+✔ Pixel (ablativo fracionado): rejuvenescimento, rugas, flacidez e cicatrizes de acne
+✔ Luz Intensa Pulsada: manchas de sol, vasinhos, rosácea e estímulo de colágeno
+
+Pode ser usado em face, pescoço, colo, braços e mãos. Realizado pela equipe médica com duração de 30 a 40 minutos.
+
+Posso te ajudar a agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Harmony XL aqui na clínica!
+
+Para o dia:
+• Para a ponteira Pixel: anestésico tópico 60 minutos antes
+• Não estar com a pele bronzeada
+• Sem inflamações ativas
+
+Aplicaremos máscara calmante após o Pixel por 30 minutos. Te esperamos!
+
+At, {atd} 🌷`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Harmony XL:
+
+• Pode haver vermelhidão e pele levemente áspera — some ao longo dos dias
+• Evite exposição solar por 15 dias conforme o tratamento
+• Use filtro solar e hidratante regularmente
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Está no período ideal para retomar o Harmony XL! As sessões são realizadas com intervalos de 30 dias.
+
+Posso verificar os horários disponíveis? 😊
+
+At, {atd} 🌷`
+}},
+youlaser:{n:'Youlaser (Quanta Laser)',c:'facial',h:'CO2 + 1540nm simultâneos, mínimo downtime',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar o Youlaser, uma tecnologia diferenciada de rejuvenescimento que temos aqui na clínica!
+
+O Youlaser emite dois tipos de laser ao mesmo tempo:
+✔ CO2 (ablativo): trata a superfície da pele
+✔ 1540nm (não ablativo): estimula colágeno nas camadas profundas
+
+O resultado é um tratamento mais completo, com baixo tempo de recuperação! Indicado para:
+
+✔ Rugas finas
+✔ Estrias
+✔ Cicatrizes de acne
+✔ Envelhecimento e estímulo de colágeno
+
+Disponível nas unidades Jd. Europa, Morumbi e Vila Olímpia. Realizado pela equipe médica.
+
+Posso te ajudar a agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Youlaser aqui na clínica!
+
+Para o dia:
+• Anestésico tópico 60 minutos antes
+• A pele não pode estar bronzeada
+• Pare o uso de ácidos 2 dias antes
+
+A sessão dura de 30 a 60 minutos. Te esperamos!
+
+At, {atd} 🌷`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Youlaser:
+
+• Pele avermelhada por cerca de 7 dias
+• Leve inchaço por cerca de 2 dias
+• Atenção: pode reativar herpes labial — caso tenha histórico, avise a médica para profilaxia
+• Evite sol por 30 dias
+• Maquiagem e filtro solar somente no dia seguinte
+• Evite cozinhar e se aproximar de fontes de calor
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Está no período ideal para retomar o Youlaser! O intervalo entre sessões é de aproximadamente 4 semanas.
+
+Posso verificar os horários disponíveis? 😊
+
+At, {atd} 🌷`
+}},
+youlaserintimo:{n:'Youlaser íntimo (Quanta Laser)',c:'intimo',h:'CO2 + 1540nm, mucosa vaginal',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Queria te apresentar o Youlaser Íntimo, um tratamento que tem feito muita diferença na qualidade de vida das nossas pacientes aqui na clínica!
+
+É um laser que emite dois comprimentos de onda ao mesmo tempo (ablativo e não ablativo) diretamente na mucosa vaginal. O procedimento é minimamente invasivo, rápido e indolor. Trata:
+
+✔ Envelhecimento íntimo
+✔ Atrofia vaginal
+✔ Flacidez da região
+✔ Incontinência urinária
+✔ Falta de lubrificação
+
+Disponível nas unidades Jd. Europa, Morumbi e Vila Olímpia. Sessão de 60 minutos.
+
+Posso te ajudar a agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Youlaser Íntimo aqui na clínica!
+
+Para o dia:
+• Região higienizada
+• Evite relações sexuais 48 horas antes
+• Não estar menstruada
+
+Te esperamos com carinho! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Youlaser Íntimo:
+
+• Evite relações sexuais por 48 horas
+• Mantenha a região limpa e seca
+• Evite banhos muito quentes, piscinas e sauna por 48 horas
+• Use os produtos conforme orientação médica
+• Pode ocorrer leve inchaço e vermelhidão — normal!
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Passando para te lembrar que está na hora de retomar o Youlaser Íntimo! A regularidade no tratamento garante os melhores resultados.
+
+Posso verificar os horários disponíveis? 😊
+
+At, {atd} 🌷`
+}},
+ultralmd:{n:'Ultra Laser MD (Lutronic)',c:'facial',h:'Thulium 1927nm, melasma, todos os fototipos',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar o Ultra Laser MD, um dos nossos lasers mais modernos aqui na clínica, disponível na unidade Jd. Paulista!
+
+É um laser de Thulium com comprimento de onda de 1927nm. Ele age tanto na superfície (ablativo na epiderme) quanto nas camadas profundas (não ablativo na derme), sendo muito seguro para todos os fototipos de pele.
+
+Indicado para:
+✔ Melasma e melanoses
+✔ Foto rejuvenescimento
+✔ Cicatrizes e hipercromia
+✔ Estrias
+✔ Textura e pigmentações
+
+Também é excelente para drug delivery com substâncias clareadoras. Realizado pela equipe médica.
+
+Posso te ajudar a agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Ultra Laser MD aqui na clínica!
+
+Para o dia:
+• Anestésico tópico de 30 minutos a 1 hora antes
+• A pele não pode estar bronzeada
+
+Aplicaremos máscara calmante após o procedimento. Te esperamos!
+
+At, {atd} 🌷`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Ultra Laser MD:
+
+• Pele avermelhada por 2 a 3 dias
+• Ardência e calor nos primeiros dias
+• Aspereza por 5 a 7 dias
+• Limpeza diária com sabonete suave e água fria, 2 vezes ao dia
+• Hidratante diariamente
+• Filtro solar — indispensável!
+• Evite sol intenso por 15 dias
+
+O resultado melhora ao longo das sessões! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Está no período ideal para retomar o Ultra Laser MD! As sessões são mensais e normalmente são feitas de 3 a 5 ao todo.
+
+Posso verificar os horários disponíveis? 😊
+
+At, {atd} 🌷`
+}},
+volnewmer:{n:'Volnewmer (Classys)',c:'facial',h:'RF monopolar, lifting e firmeza',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar o Volnewmer, uma das nossas tecnologias de radiofrequência mais avançadas aqui na clínica, disponível nas unidades Jd. Europa e Jd. Paulista!
+
+É uma radiofrequência monopolar que promove lifting e trata a flacidez de forma eficaz. O diferencial é que ele atua por sobreposição de energia, reestruturando e regenerando o colágeno sem quebrar a barreira da pele:
+
+✔ Efeito lifting facial
+✔ Melhora da flacidez
+✔ Tonificação da pele
+✔ Definição do contorno
+✔ Melhora da elasticidade e densidade
+
+Realizado pela equipe médica. Sessão de 30 a 90 minutos. Manutenção semestral!
+
+Posso te ajudar a agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Volnewmer aqui na clínica!
+
+Para o dia: aplicaremos anestésico tópico de 30 a 60 minutos antes. Venha com a pele limpa.
+
+O procedimento não exige recuperação — você já pode retornar à sua rotina normalmente!
+
+Te esperamos! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Volnewmer:
+
+• Pode haver leve edema (inchaço) que desaparece em 24 a 48 horas
+• Sem restrições após o procedimento!
+• Use filtro solar diariamente
+
+O resultado vai evoluindo ao longo dos meses enquanto o colágeno é remodelado 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Passando para te lembrar que o Volnewmer tem manutenção semestral — e está chegando o período ideal para renovar o lifting e a firmeza!
+
+Posso verificar os horários disponíveis? 😊
+
+At, {atd} 🌷`
+}},
+volite:{n:'Volite',c:'injetavel',h:'AH superficial, textura e brilho',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar o Volite, um tratamento injetável de ácido hialurônico que temos aqui na Clínica Adriana Vilarinho!
+
+Ele é aplicado de forma superficial, em pequenas injeções, para melhorar a qualidade da pele. O objetivo não é preencher nem volumizar, mas sim:
+
+✔ Hidratação profunda da pele
+✔ Melhora da textura e elasticidade
+✔ Redução de linhas finas
+✔ Estimulação de colágeno
+✔ Luminosidade e viço natural
+
+Pode ser usado no rosto, pescoço, colo e mãos. Realizado pela equipe médica!
+
+Posso te ajudar a agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Volite aqui na clínica!
+
+Não é necessário preparo especial. Após o procedimento pode ocorrer pequeno edema e vermelhidão na área — é normal e transitório!
+
+Te esperamos com carinho 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Volite:
+
+• Pode ocorrer pequeno edema e vermelhidão na área — normal e passageiro!
+• Use filtro solar diariamente
+• Mantenha a hidratação da pele
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Estava pensando em você! O Volite é aquele tratamento que mantém a pele com brilho, textura equilibrada e aquela hidratação profunda que todo mundo nota.
+
+Que tal marcarmos? 😊
+
+At, {atd} 🌷`
+}},
+fotona:{n:'Fotona',c:'facial',h:'Erbium Yag + ND Yag, rejuvenescimento profundo',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar o Fotona, um tratamento laser diferenciado que temos aqui na clínica, disponível nas unidades Jd. Paulista e Jd. Europa!
+
+O Fotona combina dois lasers poderosos: Erbium Yag e ND Yag, para um rejuvenescimento celular de longo prazo, comprovado por estudos científicos.
+
+Uma das características mais especiais é que ele pode ser aplicado inclusive dentro da boca, para tratar sulcos, rugas e flacidez ao redor dos lábios e no contorno facial!
+
+✔ Flacidez de face, pescoço e corpo
+✔ Melhora do tônus e textura da pele
+✔ Tratamento de sulcos e rugas ao redor dos lábios
+✔ Pode ser usado também na região íntima feminina
+
+Sessão de 60 minutos. Realizado pela equipe médica.
+
+Posso te ajudar a agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Fotona aqui na clínica!
+
+Para o dia: aplicaremos anestésico tópico 30 minutos antes. Aplicaremos também máscara calmante após o procedimento por 30 minutos.
+
+A pele pode ficar com tom rosado por aproximadamente 24 horas — maquiagem e filtro solar estão liberados no dia seguinte!
+
+Te esperamos! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Fotona:
+
+• A pele pode ficar com tom rosado por aproximadamente 24 horas
+• Maquiagem e filtro solar estão liberados no dia seguinte
+• Use filtro solar diariamente
+• Siga as orientações da equipe médica
+
+O resultado melhora nas semanas seguintes! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Estava verificando sua ficha e vi que está no período ideal para retomar o Fotona! O intervalo indicado é de 4 a 6 semanas entre sessões.
+
+Posso verificar os horários disponíveis? 😊
+
+At, {atd} 🌷`
+}},
+picolo:{n:'Picolo (Laseroptek)',c:'facial',h:'Picossegundos, manchas, rejuvenescimento',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar o Picolo, um laser de picossegundos que temos aqui na clínica, disponível nas unidades Jd. Europa e Morumbi!
+
+É um laser Nd:Yag/KTP que emite pulsos ultracurtos e intensos em picossegundos, entregando a energia de forma muito eficiente — com menos dor, menos efeitos adversos e menor tempo de recuperação. Indicado para:
+
+✔ Rejuvenescimento facial
+✔ Melhora de textura e brilho
+✔ Pigmentações e manchas
+✔ Remoção de tatuagem
+
+Sessão de 30 a 60 minutos. Realizado pela equipe médica.
+
+Posso te ajudar a agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Picolo aqui na clínica!
+
+Para o dia: aplicaremos anestésico tópico 30 minutos antes. Aplicaremos máscara calmante após a sessão por 15 a 20 minutos.
+
+Te esperamos! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Picolo:
+
+• Limpeza com sabonete suave e hidratante diariamente
+• Filtro solar — indispensável!
+• Evite exposição solar intensa por 15 dias
+• Pode surgir leve púrpura ou bolinhas vermelhas que somem ao longo dos dias
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Passando para te lembrar que as sessões de Picolo são mensais — e manter a regularidade é o que garante os melhores resultados!
+
+Posso verificar os horários disponíveis? 😊
+
+At, {atd} 🌷`
+}},
+picoway:{n:'Picoway (Candela)',c:'facial',h:'5 ponteiras, qualquer fototipo, Jd. Paulista',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar o Picoway, nosso laser de picossegundos disponível na unidade Jd. Paulista!
+
+Ele utiliza pulsos extremamente rápidos (em picossegundos) com efeito fotoacústico — e não térmico — tornando o tratamento muito mais seguro e eficaz. O grande diferencial é que pode ser feito em qualquer fototipo de pele!
+
+Possui 5 ponteiras com diferentes comprimentos de onda, tratando:
+✔ Manchas, melasma e olheiras pigmentadas
+✔ Rejuvenescimento e estímulo de colágeno
+✔ Remoção de tatuagem
+
+Sessão mínima de 30 minutos. Realizado pela equipe médica.
+
+Posso te ajudar a agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Picoway aqui na clínica!
+
+Para o dia: aplicaremos anestésico tópico 30 minutos antes.
+
+Te esperamos! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Picoway:
+
+• A pele pode ficar avermelhada — normal!
+• Evite exposição ao sol e fontes de calor
+• Para remoção de tatuagem: podem ocorrer crostas e inchaço — siga as orientações médicas
+• Evite sol, calor e vapores por 7 a 15 dias
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Passando para te lembrar que o intervalo entre sessões do Picoway é de 4 a 6 semanas. Manter a regularidade é fundamental para o resultado!
+
+Posso verificar os horários disponíveis? 😊
+
+At, {atd} 🌷`
+}},
+picosure:{n:'Picosure (Cynosure)',c:'facial',h:'Primeiro picossegundos do mundo, Vila Olímpia',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar o Picosure, disponível na nossa unidade Vila Olímpia!
+
+É o primeiro laser de picossegundos do mundo — 100 vezes mais rápido do que os aparelhos convencionais, o que permite tratamentos seguros, mais indolores e com ótimos resultados:
+
+✔ Manchas (melasma e melanose)
+✔ Remoção de tatuagens
+✔ Rejuvenescimento e melhora de textura
+
+A grande vantagem é o mínimo de efeitos adversos e o rápido retorno à rotina.
+
+Sessão mínima de 30 minutos. Realizado pela equipe médica.
+
+Posso te ajudar a agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Picosure aqui na clínica!
+
+Para o dia: anestésico tópico de 30 a 60 minutos antes. Para rejuvenescimento: aplicaremos máscara calmante de 30 minutos após a sessão.
+
+Te esperamos! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Picosure:
+
+• Melasma/rejuvenescimento: pele pode ficar rosada por cerca de 10 minutos
+• Tatuagens e manchas: evite sol e fontes de calor por cerca de 20 dias
+• Podem surgir casquinhas no local — não force!
+• Use filtro solar diariamente
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Passando para te lembrar que o intervalo entre sessões do Picosure é de 4 a 6 semanas!
+
+Posso verificar os horários disponíveis? 😊
+
+At, {atd} 🌷`
+}},
+xeocutera:{n:'Xeo-Cutera',c:'facial',h:'Genesis + IPL, vasinhos, rosácea e manchas',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar o Xeo-Cutera, uma plataforma multifuncional que temos aqui na clínica!
+
+Ele combina dois tipos de tecnologia em um mesmo aparelho:
+
+✔ Laser ND:Yag micro pulsado (Genesis): vasinhos, rosácea, olheiras, poros, acne e sinais de envelhecimento
+✔ Luz Intensa Pulsada (IPL): manchas acastanhadas, vermelhidão, rosácea e vasos finos
+
+O grande diferencial é que não precisa de anestésico! A sessão dura de 15 a 20 minutos e pode ser repetida semanalmente ou quinzenalmente.
+
+Realizado pela equipe médica. Posso te ajudar a agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Xeo-Cutera aqui na clínica!
+
+Não é necessário anestésico. Venha com a pele limpa, sem maquiagem.
+
+A sessão é rápida — 15 a 20 minutos — e você já pode voltar às suas atividades normalmente! Te esperamos! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Xeo-Cutera:
+
+• Pode ocorrer leve vermelhidão após a aplicação — desaparece em até 24 horas
+• Limpeza, hidratação e proteção solar diária
+• Pode manter a rotina de cremes em casa normalmente
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Faz um tempo que não faz o Xeo-Cutera! Ele é ótimo para manter vasinhos, rosácea e manchas sob controle — e quanto mais regular, melhor o resultado.
+
+Que tal retomar? 😊
+
+At, {atd} 🌷`
+}},
+dermav:{n:'Derma V (Lutronic)',c:'facial',h:'Lesões vasculares, rosácea, olheiras',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar o Derma V, um laser especializado que temos aqui na clínica, disponível na unidade Jd. Paulista!
+
+É um laser com comprimento de onda ajustável (532 ou 1064nm), equipado com sistema de resfriamento integrado para máximo conforto. Trata condições específicas com muita precisão:
+
+✔ Lesões vasculares (manchas vinho do porto, hemangiomas, vasos finos)
+✔ Rosácea e cicatrizes de acne
+✔ Melasma e olheiras com fundo vascular
+✔ Rejuvenescimento geral (poros, linhas finas, brilho)
+
+Sessão de 30 minutos. Realizado pela equipe médica.
+
+Posso te ajudar a agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Derma V aqui na clínica!
+
+Para o dia: venha com a pele limpa. A pele não pode estar bronzeada e não pode haver infecção ativa na área.
+
+A sessão dura 30 minutos. Te esperamos! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Derma V:
+
+• A pele pode ficar avermelhada e com sensação de ardor por algumas horas — normal!
+• Use protetor solar diariamente
+• Evite exposição solar intensa
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Passando para te lembrar que o intervalo entre sessões do Derma V é de 30 dias.
+
+Posso verificar os horários disponíveis? 😊
+
+At, {atd} 🌷`
+}},
+plexr:{n:'Plexr (GMV)',c:'facial',h:'Plasma, retração e neoformações',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar o Plexr, um equipamento diferenciado que temos aqui na clínica!
+
+Ele utiliza plasma para promover a retração dos tecidos e estimular a produção de colágeno. Possui três aplicadores para diferentes indicações:
+
+✔ Acne ativa e queratose seborreica
+✔ Neoformações benignas na pele (fibromas, angiomas)
+✔ Rugas e lifting facial
+✔ Cicatrizes de acne
+✔ Rejuvenescimento e renovação cutânea
+
+Sessão de 30 a 60 minutos. Realizado pela equipe médica.
+
+Posso te ajudar a agendar uma avaliação? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Plexr aqui na clínica!
+
+Para o dia: aplicaremos anestésico tópico 60 minutos antes. Em alguns casos pode ser necessário bloqueio anestésico adicional.
+
+Te esperamos! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Plexr:
+
+• Pode ocorrer inchaço, vermelhidão e dor de leve a moderada
+• Evite exposição solar até a recuperação completa — importante para não manchar!
+• Siga as orientações médicas para cuidados com a região tratada
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Passando para verificar se está tudo bem após o Plexr e se há interesse em novas sessões conforme indicação médica.
+
+Qualquer dúvida estou à disposição! 😊
+
+At, {atd} 🌷`
+}},
+mmp:{n:'MMP (Microagulhamento)',c:'facial',h:'Inserção de ativos, melasma, rejuvenescimento',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te contar sobre o MMP, nossa tecnologia de microagulhamento aqui na Clínica Adriana Vilarinho!
+
+É um tratamento que utiliza microagulhamento para inserir medicamentos e ativos diretamente na pele ou no couro cabeludo, com altíssima precisão. Muito indicado para:
+
+✔ Alopecias (queda e tratamento capilar)
+✔ Melasma e hiperpigmentações
+✔ Rejuvenescimento facial
+✔ Sardas brancas
+
+Os ativos chegam exatamente onde precisam agir, potencializando muito o resultado!
+
+Sessão de 30 a 40 minutos. Realizado pela equipe médica.
+
+Posso te ajudar a agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu MMP aqui na clínica!
+
+Para o dia:
+• Para face: anestésico tópico de 30 a 60 minutos antes
+• Sem lesões ou inflamações ativas na pele ou couro cabeludo
+
+Te esperamos! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós MMP:
+
+• Evite exposição solar por 7 dias
+• O MMP facial pode deixar a região avermelhada por até 24 horas
+• Evite exposição ao sol, calor e vapores por 7 a 15 dias
+• Siga as orientações médicas para o tratamento domiciliar
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Estava verificando sua ficha e vi que está no período ideal para retomar o MMP! O intervalo entre sessões é de 15 dias.
+
+Posso verificar os horários disponíveis? 😊
+
+At, {atd} 🌷`
+}},
+nctf:{n:'NCTF (Fillmed Laboratories)',c:'injetavel',h:'AH + vitaminas + aminoácidos, redensificação',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar o NCTF, um tratamento incrível de redensificação e rejuvenescimento que temos aqui na clínica!
+
+É um complexo de ativos que inclui ácido hialurônico, vitaminas, aminoácidos, coenzimas, ácidos nucléicos e minerais. Pode ser aplicado via drug delivery pós-laser ou por injeções múltiplas. Trata:
+
+✔ Rugas finas e linhas de expressão
+✔ Hidratação profunda e luminosidade
+✔ Perda de elasticidade e firmeza
+✔ Estimulação de colágeno
+✔ Rejuvenescimento geral
+
+Pode ser usado no rosto, pescoço, colo, mãos e braços. Realizado pela equipe médica.
+
+Posso te ajudar a agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu NCTF aqui na clínica!
+
+Não é necessário preparo especial. A sessão tem duração mínima de 30 minutos.
+
+Te esperamos com carinho! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós NCTF:
+
+• Pode ocorrer leve inchaço e vermelhidão por até 24 horas
+• Pequenos caroços que desaparecem em algumas horas
+• Evite maquiagem nas primeiras horas
+• Evite exercícios físicos intensos nas primeiras 24 horas
+• Filtro solar com FPS alto
+• Hidrate bem a pele
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Passando para te lembrar que está na hora de retomar o NCTF! O tratamento é feito em 2 a 4 sessões e a regularidade potencializa muito os resultados.
+
+Posso verificar os horários disponíveis? 😊
+
+At, {atd} 🌷`
+}},
+pdrn:{n:'PDRN',c:'facial',h:'DNA de salmão, regeneração celular',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar o PDRN, um tratamento inovador de regeneração celular que temos aqui na clínica!
+
+É um produto derivado do DNA purificado do salmão — e funciona como um verdadeiro fator de crescimento para a pele. Aplicado de forma tópica (drug delivery), ele:
+
+✔ Promove regeneração celular
+✔ Estimula produção de colágeno e elastina
+✔ Proporciona hidratação profunda
+✔ Melhora textura, firmeza e brilho da pele
+✔ Reduz rugas e linhas finas
+
+Sessão de 30 minutos. Realizado pela equipe médica em associação com lasers e tecnologias.
+
+Posso te ajudar a agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu PDRN aqui na clínica!
+
+Não é necessário preparo especial. O PDRN é aplicado após o laser ou tecnologia indicada pela médica, potencializando o resultado!
+
+Te esperamos! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Os cuidados pós PDRN seguem as orientações do procedimento associado (laser ou tecnologia realizada antes).
+
+Em geral:
+• Use filtro solar diariamente
+• Mantenha a pele hidratada
+• Siga as orientações da equipe médica
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+O PDRN é um daqueles ativos que a pele adora receber! Que tal incluir na sua próxima sessão de laser?
+
+Me avise se quiser agendar 😊
+
+At, {atd} 🌷`
+}},
+exossomos:{n:'Exossomos (ExoCoBio)',c:'facial',h:'Drug delivery pós-laser, regeneração',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Queria te apresentar os Exossomos da ExoCoBio, um dos tratamentos mais modernos que temos aqui na clínica!
+
+Exossomos são pequenas vesículas celulares com funções regenerativas. Os aprovados para uso no Brasil são de origem botânica e são aplicados de forma tópica (drug delivery) após lasers fracionados ou microagulhamento.
+
+Eles potencializam o resultado do tratamento anterior, acelerando a regeneração e proporcionando:
+
+✔ Rejuvenescimento facial
+✔ Tratamento capilar
+✔ Cicatrização de feridas
+✔ Rejuvenescimento íntimo
+
+Sessão de 30 minutos. Realizado pela equipe médica em associação com outras tecnologias.
+
+Posso te ajudar a agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando sua sessão com Exossomos aqui na clínica!
+
+Os Exossomos são aplicados após a tecnologia principal (laser ou microagulhamento) — é o complemento perfeito para potencializar o resultado!
+
+Os cuidados pós-procedimento seguem as orientações do tratamento associado. Te esperamos!
+
+At, {atd} 🌷`,
+'Pós-procedimento':`Olá! 😊
+
+Os cuidados pós Exossomos acompanham o tratamento realizado antes (laser ou microagulhamento).
+
+Em geral:
+• A pele pode apresentar vermelhidão ou sensibilidade ao toque
+• Siga as orientações da equipe médica para o tratamento específico
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Os Exossomos são indicados em 3 a 4 sessões — que tal incluir no seu próximo tratamento de laser para potencializar ainda mais o resultado?
+
+Me avise se quiser saber mais! 😊
+
+At, {atd} 🌷`
+}},
+prpfacial:{n:'PRP facial',c:'facial',h:'Plasma autólogo, rejuvenescimento',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar o PRP Facial, um tratamento natural e muito eficaz que temos aqui na Clínica Adriana Vilarinho!
+
+PRP significa Plasma Rico em Plaquetas — e o especial é que usamos o sangue do próprio paciente! Uma pequena amostra é coletada, processada e aplicada diretamente no rosto (injetável ou drug delivery pós-laser). As plaquetas são ricas em fatores de crescimento que:
+
+✔ Promovem regeneração da pele
+✔ Tratam rugas finas e linhas de expressão
+✔ Melhoram cicatrizes de acne
+✔ Reduzem poros dilatados
+✔ Melhoram a textura da pele
+
+Sessão de 60 minutos. Realizado pela equipe médica!
+
+Posso te ajudar a agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu PRP Facial aqui na clínica!
+
+Orientações para o dia:
+• Venha bem hidratada(o) — beba água antes!
+• Coma normalmente
+
+A sessão dura 60 minutos (incluindo coleta, processamento e aplicação). Te esperamos! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós PRP Facial:
+
+• Evite contato com sol em caso de hematoma
+• Se realizado por drug delivery: siga as orientações do laser associado
+• Use filtro solar diariamente
+
+O resultado é gradual e melhora ao longo das sessões! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Passando para te lembrar que está no período ideal para a próxima sessão de PRP Facial! O intervalo é de 30 dias e indica-se no mínimo 4 sessões.
+
+Posso verificar os horários disponíveis? 😊
+
+At, {atd} 🌷`
+}},
+rigenera:{n:'Rigenera (HBW)',c:'capilar',h:'Células autólogas, folículos capilares',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar o Rigenera, um tratamento capilar diferenciado que temos aqui na clínica, disponível nas unidades Bento de Andrade e Hungria!
+
+É uma técnica que usa células do próprio paciente para regenerar os folículos capilares. Uma pequena amostra de pele do couro cabeludo é coletada, processada no aparelho e aplicada via micro injeções — tudo de forma minimamente invasiva!
+
+Indicado para:
+✔ Alopecia androgenética e areata
+✔ Queda de cabelo pós-quimioterapia
+✔ Eflúvio telógeno
+✔ Afinamento dos fios
+✔ Pós-transplante capilar
+
+Sessão de 60 minutos. Realizado pela equipe médica!
+
+Posso te ajudar a agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Rigenera aqui na clínica!
+
+Não é necessário preparo especial. A sessão dura 60 minutos.
+
+Após o procedimento, passarei todas as orientações de cuidado. Te esperamos!
+
+At, {atd} 🌷`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Rigenera:
+
+• Pode ocorrer vermelhidão, inchaço ou sensibilidade no local — normal!
+• Evite lavar o cabelo nas primeiras 24 a 48 horas
+• Não use produtos químicos (tinturas, alisamentos) por 15 dias
+• Evite pressão ou massagem no couro cabeludo
+• Mantenha o couro cabeludo limpo com shampoos suaves após 48 horas
+• Proteja o couro cabeludo do sol por 7 a 10 dias
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+O Rigenera pode ser feito com intervalo de 6 a 12 meses — e está chegando o período ideal para a sua manutenção!
+
+Posso verificar os horários disponíveis? 😊
+
+At, {atd} 🌷`
+}},
+velashape:{n:'VelaShape III (Candela)',c:'corporal',h:'RF + endermologia + infravermelho',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar o VelaShape III, um dos nossos tratamentos corporais mais completos para celulite e remodelação!
+
+Ele combina três tecnologias em um só aplicador:
+✔ Radiofrequência
+✔ Endermologia (sucção com rolamento)
+✔ Infravermelho
+
+Essa combinação aquece os tecidos de forma controlada, quebrando gordura localizada e estimulando colágeno. Remodelando:
+✔ Abdômen
+✔ Coxas e culotes
+✔ Glúteos
+
+Disponível nas unidades Anália Franco, Morumbi e Vila Olímpia. Sessão de 30 a 60 minutos.
+
+Posso te agendar uma avaliação? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu VelaShape III aqui na clínica!
+
+Não é necessário preparo especial. A sessão dura de 30 a 60 minutos dependendo da região e protocolo.
+
+Te esperamos! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós VelaShape III:
+
+• Leve vermelhidão imediatamente após — desaparece em minutos
+• Em alguns casos pode ocorrer equimose (leve hematoma): não exponha a área ao sol!
+• Mantenha hidratação e alimentação saudável para potencializar o resultado
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Estava verificando que você ainda tem sessões do protocolo VelaShape em aberto! A regularidade é essencial para os melhores resultados no tratamento de celulite e remodelação.
+
+Que tal retomar? 😊
+
+At, {atd} 🌷`
+}},
+power2:{n:'Power 2 (Eunsung Lasers)',c:'corporal',h:'RF + LED + vácuo + endermologia',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar o Power 2, um sistema corporal e facial muito completo que temos aqui na clínica, disponível nas unidades Jd. Europa e Jd. Paulista!
+
+Ele combina 4 tecnologias:
+✔ Radiofrequência
+✔ LED de baixa intensidade
+✔ Vácuo
+✔ Endermologia
+
+Com diversas ponteiras para diferentes regiões e objetivos:
+✔ Celulite e flacidez corporal (coxas, glúteos, braços, abdômen)
+✔ Flacidez facial (pescoço, colo, rosto)
+✔ Tratamento de gordura localizada
+
+Sessão de 30 a 60 minutos. Retorno imediato à rotina!
+
+Posso te agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Power 2 aqui na clínica!
+
+Não é necessário preparo especial. A sessão dura de 30 a 60 minutos.
+
+Após o procedimento a vermelhidão desaparece rapidamente e você já pode retornar à rotina! Te esperamos! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Pós Power 2 as orientações são bem simples:
+
+• Leve vermelhidão que desaparece rapidinho!
+• Pode retornar às atividades normalmente
+• Mantenha hidratação e alimentação saudável para potencializar o resultado
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Estava pensando em você! O Power 2 pode ser feito semanalmente e os resultados dependem da regularidade das sessões.
+
+Que tal retomar o protocolo? 😊
+
+At, {atd} 🌷`
+}},
+hyperslim:{n:'Hyper Slim (Medical San)',c:'corporal',h:'80 mil contrações em 30 min, eletromagnético',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar o Hyper Slim, uma plataforma de alto desempenho para definição corporal que temos aqui na clínica, disponível nas unidades Jd. Paulista e Jd. Europa!
+
+Ele usa campo eletromagnético de alta performance para realizar até 80 mil contrações musculares em apenas 30 minutos — o equivalente a muito mais do que uma aula normal de academia! Aplicado em:
+
+✔ Abdômen
+✔ Coxas e glúteos
+✔ Braços e panturrilha
+
+Indicado para:
+✔ Definição e hipertrofia muscular
+✔ Redução de gordura localizada
+✔ Melhora da celulite e flacidez
+✔ Prevenção de sarcopenia
+✔ Diástase abdominal
+
+Sessão a partir de 30 minutos. Pacote de 10 sessões!
+
+Posso te agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Hyper Slim aqui na clínica!
+
+Não é necessário preparo especial. A sessão dura a partir de 30 minutos.
+
+Pode ser que fique um pouco dolorida(o) depois — como após um treino intenso na academia! É normal e faz parte do processo. Te esperamos! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Pós Hyper Slim:
+
+• Pode ficar dolorida(o) como após academia — é sinal de que o músculo trabalhou!
+• Mantenha boa hidratação e alimentação com proteína para potencializar o resultado
+• O intervalo entre sessões é de 24 horas
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Estava verificando que você ainda tem sessões do seu pacote de Hyper Slim em aberto! Os resultados são cumulativos — quanto mais regular, mais expressiva a definição!
+
+Que tal retomar? 😊
+
+At, {atd} 🌷`
+}},
+onda:{n:'Onda (Deka Laser)',c:'corporal',h:'Micro-ondas, gordura + celulite + flacidez',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar o Onda, um tratamento corporal que temos aqui na clínica, disponível nas unidades Jd. Paulista, Jd. Europa e Anália Franco!
+
+O Onda é um aparelho que emite micro-ondas, promovendo um efeito térmico diretamente entre as células de gordura. Ele trata de forma não invasiva:
+
+✔ Gordura localizada em pequenas áreas
+✔ Celulite
+✔ Flacidez (estimulando o colágeno da região)
+
+Sessão de aproximadamente 30 minutos por região. Sem preparo e sem recuperação!
+
+Posso te agendar uma avaliação? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Onda aqui na clínica!
+
+Não é necessário nenhum preparo especial. A sessão dura cerca de 30 minutos por região.
+
+Pode ocorrer leve vermelhidão e, eventualmente, cólicas na região do abdômen — é normal! Te esperamos! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Onda:
+
+• Leve vermelhidão logo após — desaparece rapidinho!
+• Podem ocorrer cólicas na região do abdômen, mas não é frequente
+• Retorno imediato à sua rotina
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Passando para te lembrar que está no período ideal para retomar o Onda! Para gordura/celulite o intervalo é de 20 dias e para flacidez, 15 dias.
+
+Posso verificar os horários disponíveis? 😊
+
+At, {atd} 🌷`
+}},
+peelcristal:{n:'Peeling de cristal',c:'estetica',h:'Microdermoabrasão, estrias, cicatrizes',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te contar sobre o Peeling de Cristal, um tratamento de microdermoabrasão que fazemos aqui na Clínica Adriana Vilarinho!
+
+É um procedimento que usa microdermoabrasão controlada para esfoliar as camadas superficiais da pele, eliminando irregularidades e melhorando a aparência geral. Indicado para:
+
+✔ Renovação celular
+✔ Textura mais macia e linhas finas
+✔ Tratamento coadjuvante de estrias e cicatrizes
+✔ Clarear manchas
+
+Pode ser feito logo após a limpeza de pele para resultados ainda melhores! Sessão de 20 a 30 minutos. Pode ser repetido quinzenal ou mensalmente.
+
+Quer saber mais ou agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Peeling de Cristal aqui na clínica!
+
+Orientações: não use ácidos 2 dias antes. Venha com a pele limpa, sem maquiagem.
+
+A sessão dura de 20 a 30 minutos! Te esperamos! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Peeling de Cristal:
+
+• A pele não descama após a sessão
+• Evite usar ácidos por 2 dias
+• Use filtro solar regularmente — essencial!
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Faz um tempo que não faz o Peeling de Cristal! É um daqueles procedimentos que mantém a pele sempre renovada e com textura equilibrada.
+
+Que tal agendar? 😊
+
+At, {atd} 🌷`
+}},
+peeldiamante:{n:'Peeling diamante',c:'estetica',h:'Ponteiras diamantadas, polimento e textura',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar o Peeling Diamante, um tratamento de microdermoabrasão superficial que fazemos aqui na clínica!
+
+É feito com ponteiras diamantadas que fazem um "polimento" da pele, removendo as células mortas da camada superficial. Indicado para:
+
+✔ Melhora da textura da pele
+✔ Suavizar pequenas cicatrizes de acne
+✔ Amenizar rugas finas (até ao redor da boca)
+✔ Clarear manchas
+✔ Amenizar estrias
+
+Pode ser feito no rosto, costas e bumbum. Sessão de 20 a 30 minutos. Pode ser repetido a cada 15 dias!
+
+Quer saber mais ou agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Peeling Diamante aqui na clínica!
+
+Não é necessário preparo especial — venha com a pele limpa. A sessão dura de 20 a 30 minutos. Te esperamos! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Peeling Diamante:
+
+• Pode haver descamação delicada e praticamente imperceptível
+• Leve vermelhidão momentânea — normal!
+• Use filtro solar regularmente
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+O Peeling Diamante pode ser feito a cada 15 dias — e ele é ótimo para manter a pele sempre com textura equilibrada e renovada!
+
+Que tal agendar? 😊
+
+At, {atd} 🌷`
+}},
+rubi:{n:'Laser Rubi (Sinon)',c:'facial',h:'694nm, manchas, tatuagem, peles claras',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar o Laser Rubi, disponível na nossa unidade Anália Franco!
+
+É um laser com comprimento de onda de 694nm, proveniente de um cristal de rubi sintético, com grande especificidade para condições superficiais da pele:
+
+✔ Tratamento de manchas pigmentadas
+✔ Atenuação de lesões solares
+✔ Remoção de tatuagens e maquiagens definitivas
+✔ Tratamento de vasinhos e lesões vasculares
+✔ Remoção de pelos em peles claras
+
+Sessão de 10 a 30 minutos, dependendo da indicação. Realizado pela equipe médica.
+
+Posso te ajudar a agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Laser Rubi aqui na clínica!
+
+Para o dia: venha com a pele limpa. A pele não pode estar bronzeada.
+
+Te esperamos! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Laser Rubi:
+
+• Pode ocorrer vermelhidão, inchaço e sensação de queimação
+• Pode ocorrer formação de crostas — não force!
+• Aplique proteção solar e evite exposição direta ao sol
+• Mantenha a pele hidratada
+• Use os produtos conforme orientação médica
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Passando para te lembrar que o intervalo entre sessões do Laser Rubi é de aproximadamente 30 dias.
+
+Posso verificar os horários disponíveis? 😊
+
+At, {atd} 🌷`
+}}
+};
+
+// Merge into S
+Object.assign(S, NOVOS_S);
+
+const FALTANDO = {
+anticelulite:{n:'Anticelulite (Toskani)',c:'corporal',h:'Lipolítico tópico, drug delivery',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te contar sobre o Anticelulite da Toskani, um tratamento que temos aqui na Clínica Adriana Vilarinho!
+
+É uma solução com agentes lipolíticos intensos e extratos vegetais altamente diuréticos e drenantes. Aplicado de forma tópica via drug delivery em abdômen, pernas, braços, joelhos, glúteos, costas e mãos.
+
+✔ Combate à celulite dura
+✔ Redução de acúmulo de fluídos
+✔ Efeito descongestionante e drenante
+
+Realizado pela equipe médica. Sessão de aproximadamente 30 minutos.
+
+Posso te ajudar a agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu tratamento Anticelulite (Toskani) aqui na clínica!
+
+Para o dia: aplicaremos anestésico tópico 30 minutos antes. Venha com a área a ser tratada limpa.
+
+Te esperamos! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Anticelulite (Toskani):
+
+• A área tratada pode ficar inchada — é normal!
+• Pode ficar dolorida e com hematomas por até 30 dias
+• Não exponha ao sol a área tratada
+• Use sempre proteção solar
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Passando para te lembrar que está no período ideal para retomar o Anticelulite! O intervalo é de 15 a 30 dias entre as sessões.
+
+Posso verificar os horários disponíveis? 😊
+
+At, {atd} 🌷`
+}},
+co2:{n:'CO2 Active Deep (Lumenis)',c:'facial',h:'Laser CO2 fracionado, rugas e manchas',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar o CO2 Active Deep, um dos nossos lasers mais poderosos para renovação de pele aqui na Clínica Adriana Vilarinho!
+
+É um laser de CO2 fracionado que estimula a produção de colágeno e promove renovação celular profunda. Indicado para:
+
+✔ Flacidez de pele
+✔ Manchas e danos solares
+✔ Rugas e linhas de expressão
+✔ Poros dilatados e cicatrizes de acne
+
+Realizado pela equipe médica. Pode ser feito em qualquer época do ano!
+
+Posso te ajudar a agendar uma avaliação? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu CO2 Active Deep aqui na clínica!
+
+Para o dia:
+• Anestésico tópico 60 minutos antes
+• Pele não pode estar bronzeada
+• Pare o uso de ácidos e cremes 2 dias antes
+
+Aplicaremos máscara calmante após o procedimento. Te esperamos!
+
+At, {atd} 🌷`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós CO2 Active Deep:
+
+• Pele avermelhada por 2 a 5 dias — normal!
+• Ardência e calor nos primeiros dias
+• Aspereza por 5 a 7 dias
+• Evite sol por 15 dias
+• Filtro solar diariamente — indispensável!
+• Maquiagem liberada no dia seguinte
+
+O resultado melhora ao longo das semanas! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Passando para te lembrar que está no período ideal para retomar o CO2! O intervalo entre sessões é de aproximadamente 4 semanas.
+
+Posso verificar os horários disponíveis? 😊
+
+At, {atd} 🌷`
+}},
+depilacaoduetto:{n:'Depilação Duetto (Quanta System)',c:'corporal',h:'Alexandrite + ND Yag, peles morenas',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te contar sobre a nossa Depilação Duetto, disponível na unidade Jd. Europa!
+
+O Duetto combina dois comprimentos de onda — Alexandrite e ND Yag — o que permite atingir pelos mais claros e tratar peles mais morenas com segurança. Ele destrói o bulbo e a haste dos pelos progressivamente!
+
+Os pelos residuais perdem espessura a cada sessão. Sessão de aproximadamente 30 minutos.
+
+Realizado pela equipe médica ou estética.
+
+Posso te ajudar a agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando sua sessão de Depilação Duetto aqui na clínica!
+
+Orientações importantes:
+• Raspe os pelos 24 a 48 horas antes
+• Evite sol por 30 dias nas áreas expostas
+• Não venha com a pele bronzeada
+• Sem infecção ativa na pele
+
+Te esperamos! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Depilação Duetto:
+
+• Evite exposição solar por 7 dias
+• Use filtro solar nas áreas depiladas expostas
+• Não arranque os pelos — apenas raspe com lâmina!
+• Use pomada calmante se necessário
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Está na hora da próxima sessão de depilação! O intervalo ideal é de 30 a 60 dias.
+
+Posso verificar os horários disponíveis? 😊
+
+At, {atd} 🌷`
+}},
+depilacaogentle:{n:'Depilação Gentle (Candela)',c:'corporal',h:'Laser Alexandrite, Anália Franco e Morumbi',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te contar sobre a nossa Depilação Gentle, disponível nas unidades Anália Franco, Jd. Paulista e Morumbi!
+
+O Gentle usa laser de Alexandrite para depilação definitiva progressiva. Ele atua diretamente sobre os pelos, produzindo calor que destrói o bulbo e a haste — os pelos residuais perdem espessura com o tempo!
+
+Sessão mínima de 15 minutos. Realizado pela equipe médica ou estética.
+
+Posso te ajudar a agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando sua sessão de Depilação Gentle aqui na clínica!
+
+Orientações:
+• Raspe os pelos 24 a 48 horas antes
+• Evite sol por 30 dias nas áreas expostas
+• Não venha com a pele bronzeada
+
+Te esperamos! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Depilação Gentle:
+
+• Evite exposição solar por 7 dias
+• Use filtro solar nas áreas expostas ao sol
+• Não arranque os pelos — apenas raspe com lâmina!
+• Use pomada calmante se necessário
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Está na hora da próxima sessão de depilação! O intervalo ideal é de aproximadamente 1 mês.
+
+Posso verificar os horários disponíveis? 😊
+
+At, {atd} 🌷`
+}},
+depilacaolightsheer:{n:'Depilação Light Sheer (Lumenis)',c:'corporal',h:'Alvo melanina, Anália Franco',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te contar sobre a nossa Depilação Light Sheer, disponível na unidade Anália Franco!
+
+O Light Sheer tem como alvo a melanina — o pigmento que dá cor à pele e aos pelos. Ao atingi-la, produz calor que destrói o bulbo e a haste, promovendo a depilação definitiva progressivamente!
+
+Sessão mínima de 15 minutos. Realizado pela equipe médica ou estética.
+
+Posso te ajudar a agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando sua sessão de Depilação Light Sheer aqui na clínica!
+
+Orientações:
+• Raspe os pelos 24 a 48 horas antes
+• Evite sol por 30 dias nas áreas expostas
+• Não venha com a pele bronzeada
+
+Te esperamos! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Depilação Light Sheer:
+
+• Evite exposição solar por 7 dias
+• Use filtro solar nas áreas expostas
+• Não arranque os pelos — apenas raspe com lâmina!
+• Use pomada calmante se necessário
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Está na hora da próxima sessão de depilação! O intervalo ideal é de aproximadamente 1 mês.
+
+Posso verificar os horários disponíveis? 😊
+
+At, {atd} 🌷`
+}},
+exossomosaut:{n:'Exossomos autólogos (Exocube)',c:'facial',h:'Plasma próprio concentrado, regeneração',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar os Exossomos Autólogos do Exocube, um tratamento muito especial que temos aqui na clínica!
+
+Diferente dos exossomos botânicos, esses são derivados do seu próprio sangue — 100% natural e personalizado! O sangue é coletado, centrifugado e processado para concentrar os exossomos, que são então aplicados topicamente em associação com laser ou microagulhamento.
+
+✔ Rejuvenescimento facial
+✔ Tratamento capilar
+✔ Cicatrização de feridas
+✔ Rejuvenescimento íntimo
+
+Sessão de 40 minutos. Realizado pela equipe médica e enfermagem.
+
+Posso te ajudar a agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando sua sessão de Exossomos Autólogos aqui na clínica!
+
+Orientações para o dia:
+• Venha bem hidratada(o) — beba água antes!
+• Coma normalmente
+
+Os exossomos são aplicados após a tecnologia principal. Te esperamos!
+
+At, {atd} 🌷`,
+'Pós-procedimento':`Olá! 😊
+
+Os cuidados pós Exossomos Autólogos seguem as orientações do tratamento associado (laser ou microagulhamento).
+
+Em geral:
+• A pele pode apresentar vermelhidão ou sensibilidade ao toque
+• Siga as orientações da equipe médica
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Os Exossomos Autólogos são indicados em 3 a 4 sessões — cada uma potencializa o resultado da anterior!
+
+Quer incluir na sua próxima sessão de laser? Me avise 😊
+
+At, {atd} 🌷`
+}},
+phosphocol:{n:'Phosphocol (Toskani)',c:'corporal',h:'Esvaziador de gordura localizada',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar o Phosphocol, um tratamento para eliminar gordura localizada persistente que temos aqui na Clínica Adriana Vilarinho!
+
+É composto por fosfatidilcolina e desoxicolato de sódio, aplicado via drug delivery (tópico). Indicado para:
+
+✔ Costas, braços e flancos
+✔ Pernas e culotes
+✔ Glúteos e abdômen
+
+Ideal para pacientes com peso corporal ideal ou ligeiramente acima. Sessão de 30 a 60 minutos. Realizado pela equipe médica.
+
+Posso te ajudar a agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Phosphocol aqui na clínica!
+
+Para o dia: aplicaremos anestésico tópico 30 minutos antes. Venha com a área a ser tratada limpa.
+
+Te esperamos! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Phosphocol:
+
+• A área pode ficar inchada, dolorida e com hematomas por até 30 dias — faz parte do processo!
+• Não exponha ao sol a área tratada
+• Use sempre proteção solar
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Passando para te lembrar que está no período ideal para retomar o Phosphocol! O intervalo é de 15 a 30 dias entre as sessões.
+
+Posso verificar os horários disponíveis? 😊
+
+At, {atd} 🌷`
+}},
+resurfxcapilar:{n:'ResurFX capilar (Lumenis)',c:'capilar',h:'Laser folicular, queda e densidade capilar',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar o ResurFX Capilar, um laser não invasivo para tratamento da queda de cabelo que temos aqui na clínica!
+
+Ele estimula os folículos pilosos, melhora a circulação sanguínea no couro cabeludo e acelera o crescimento de novos cabelos — que nascem mais resistentes e saudáveis!
+
+✔ Queda de cabelo e queda difusa
+✔ Afinamento dos fios
+✔ Alopecias
+✔ Fios quebradiços
+
+Sessão de 15 a 20 minutos. Realizado pela equipe médica.
+
+Posso te ajudar a agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu ResurFX Capilar aqui na clínica!
+
+Não é necessário preparo especial — pode vir com o cabelo lavado normalmente. A sessão dura de 15 a 20 minutos.
+
+Te esperamos! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós ResurFX Capilar:
+
+• Pode haver leve vermelhidão e sensibilidade no couro cabeludo — normal e transitório!
+• Não se exponha diretamente ao sol após o procedimento
+• Mantenha o tratamento domiciliar indicado
+
+O resultado é gradual — os fios ficam mais fortes e o volume aumenta ao longo das sessões! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Passando para te lembrar que está na hora de retomar o ResurFX Capilar! O intervalo é de 2 a 4 semanas e indica-se no mínimo 5 sessões.
+
+Posso verificar os horários disponíveis? 😊
+
+At, {atd} 🌷`
+}},
+skinvive:{n:'Skinvive (Allergan)',c:'injetavel',h:'AH hidratante, rosto, pescoço, colo e mãos',scripts:{
+'Apresentação':`Olá! Tudo bem? 🌿
+
+Deixa eu te apresentar o Skinvive, um injetável de ácido hialurônico para hidratação profunda que temos aqui na Clínica Adriana Vilarinho!
+
+Ele hidrata e renova de dentro para fora — sem volumizar. Pode ser aplicado no rosto, pescoço, colo e mãos, proporcionando:
+
+✔ Hidratação intensa e duradoura
+✔ Redução da aparência de linhas finas
+✔ Melhora da textura e qualidade da pele
+✔ Luminosidade e viço natural
+
+Sessão de 30 a 60 minutos. Realizado pela equipe médica.
+
+Posso te ajudar a agendar? 😊
+
+At, {atd} 🌷`,
+'Agendamento':`Olá! 😊
+
+Confirmando seu Skinvive aqui na clínica!
+
+Não é necessário preparo especial. A sessão dura de 30 a 60 minutos.
+
+Te esperamos com carinho! 🌷
+
+At, {atd}`,
+'Pós-procedimento':`Olá! 😊
+
+Orientações pós Skinvive:
+
+• Pode ocorrer leve inchaço, vermelhidão e hematoma — normal e transitório!
+• Evite exposição ao sol
+• Não esfregue ou massageie a área tratada
+• Use os produtos conforme orientação médica
+
+Qualquer dúvida estou aqui! 🌿
+
+At, {atd} 🌷`,
+'Reativação':`Olá! Tudo bem? 🌿
+
+Passando para te lembrar que está chegando o período ideal para retomar o Skinvive! O intervalo é de 4 a 6 semanas, com manutenção de 1 a 2 vezes por ano.
+
+Posso verificar os horários disponíveis? 😊
+
+At, {atd} 🌷`
+}}
+};
+Object.assign(S, FALTANDO);
+
+function renderSidebar(){
+  const q=document.getElementById('q').value.toLowerCase();
+  const el=document.getElementById('sbCats');
+  const groups={};
+  Object.keys(S).filter(k=>!q||S[k].n.toLowerCase().includes(q)||S[k].h.toLowerCase().includes(q))
+    .forEach(k=>{const c=S[k].c;if(!groups[c])groups[c]=[];groups[c].push(k);});
+  if(!Object.keys(groups).length){
+    el.innerHTML='<div style="color:rgba(255,255,255,0.4);font-size:13px;padding:1rem .5rem;text-align:center">Nenhum resultado encontrado</div>';
+    return;
+  }
+  el.innerHTML=Object.entries(CAT).filter(([c])=>groups[c]).map(([c,label])=>`
+    <div class="cat-group">
+      <div class="cat-title">${label}</div>
+      ${groups[c].map(k=>`
+        <button class="proc-btn${k===activeId?' active':''}" onclick="select('${k}')">
+          ${S[k].n}<span class="ph">${S[k].h}</span>
+        </button>`).join('')}
+    </div>`).join('');
+}
+
+function select(id){
+  activeId=id;
+  renderSidebar();
+  showScript(id);
+}
+
+function showScript(id){
+  const item=S[id];
+  if(!item)return;
+  document.getElementById('mainTitle').textContent=item.n;
+  document.getElementById('mainSub').textContent=CAT[item.c]+' · script pronto';
+  const atd=atendente;
+  document.getElementById('contentArea').innerHTML=`
+    <div class="tipo-pills">${TIPOS.filter(t=>item.scripts[t]).map(t=>`
+      <span class="tipo-pill${t===tipoAtivo?' on':''}" onclick="setTipo('${t}','${id}')">${t}</span>`).join('')}</div>
+    <div class="script-wrap">
+      <div class="script-top">
+        <div><div class="st-name">${item.n}</div><div class="st-cat">${CAT[item.c]} · ${tipoAtivo}</div></div>
+        <div class="st-actions">
+          <button class="act-btn" id="copyBtn" onclick="copiar('${id}')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copiar
+          </button>
+        </div>
+      </div>
+      <div class="script-body">
+        <div class="script-txt" id="stxt">${esc(buildScript(id,atd))}</div>
+      </div>
+      <div class="atd-row">
+        <span>Atendente:</span>
+        <input id="atdInput" value="${atd}" placeholder="Ex: Joyce" oninput="atualizarAtd('${id}')">
+        <button class="atd-apply" onclick="atualizarAtd('${id}')">Aplicar</button>
+      </div>
+    </div>`;
+}
+
+function buildScript(id,atd){
+  const item=S[id];
+  if(!item||!item.scripts[tipoAtivo])return'Script não disponível.';
+  const a=atd||atendente;
+  return item.scripts[tipoAtivo].replace(/\{atd\}/g,a);
+}
+
+function atualizarAtd(id){
+  atendente=document.getElementById('atdInput').value||'Joyce';
+  const el=document.getElementById('stxt');
+  if(el)el.innerHTML=esc(buildScript(id,atendente));
+}
+
+function setTipo(t,id){
+  tipoAtivo=t;
+  showScript(id);
+}
+
+function copiar(id){
+  const el=document.getElementById('stxt');
+  if(!el)return;
+  navigator.clipboard.writeText(el.innerText).then(()=>{
+    copiados++;
+    document.getElementById('stCopiados').textContent=copiados;
+    const btn=document.getElementById('copyBtn');
+    if(btn){
+      btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Copiado!';
+      btn.classList.add('copied');
+      setTimeout(()=>{
+        btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar';
+        btn.classList.remove('copied');
+      },2000);
+    }
+  });
+}
+
+function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+renderSidebar();
+</script>
+</body>
+</html>
